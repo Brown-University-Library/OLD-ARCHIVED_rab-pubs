@@ -13,10 +13,10 @@
 				<a class="pubs-nav-header" href="#">Publication Manager</a>
 			<div class="pubs-nav-bar">
 				<ul class="pubs-nav-menu">
-					<li><a href="#!pubs=open">Citations</a></li>
-					<li><a href="#!styles=open">Styles</a></li>
-					<li><a href="#!harvest=open">Harvesting</a></li>
-					<li><a href="#!help=open">Help</a></li>
+					<li><a href="#pubs=open">Citations</a></li>
+					<li><a href="#styles=open">Styles</a></li>
+					<li><a href="#harvest=open">Harvesting</a></li>
+					<li><a href="#help=open">Help</a></li>
 				</ul>
 			</div>
 		</div>
@@ -26,18 +26,18 @@
 		<div class="row">
 			<div class="col-sm-3">
 				<ul class="sidebar sidebar-citations">
-					<li class="active">Pending</li>
-					<li>Approved</li>
-					<li>Rejected</li>
-					<li>Add a Citation</li>
+					<li><a href="#pending" class="active">Pending</a></li>
+					<li><a href="#approved">Approved</a></li>
+					<li><a href="#rejected">Rejected</a></li>
+					<li><a href="#addCitation">Add a Citation</a></li>
 				</ul>
-				<ul class="sidebar sidebar-styles hidden">
-					<li class="active">Custom Citation Styles</li>
-					<li>Add a Citation Style</li>
+				<ul class="sidebar sidebar-styles">
+					<li><a href="#customStyles" class="active">Custom Citation Styles</a></li>
+					<li><a href="#addStyle">Add a Citation Style</a></li>
 				</ul>
-				<ul class="sidebar sidebar-harvesting hidden">
-					<li class="active">Settings</li>
-					<li>Initiate Harvest</li>
+				<ul class="sidebar sidebar-harvesting">
+					<li><a href="#harvestSettings" class="active">Settings</a></li>
+					<li><a href="#startHarvest">Initiate Harvest</a></li>
 				</ul>
 			</div>
 			<div class="col-sm-9 main">
@@ -63,12 +63,12 @@
     	</div>
     </div>
     <script>
-    	var $lis;
+    	var $anchs;
 
-    	$lis = $(".sidebar > li");
-    	$lis.each( function ($li) {
+    	$anchs = $(".sidebar > li > a");
+    	$anchs.each( function ($li) {
     		$(this).click( function() {
-    			$(this).siblings().removeClass('active');
+    			$(this).parent('li').siblings().find('a').removeClass('active');
     			$(this).addClass('active');
     		});
     	});
