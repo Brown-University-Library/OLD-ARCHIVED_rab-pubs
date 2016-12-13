@@ -8,15 +8,14 @@
 	<script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<!-- navbar navbar-inverse navbar-fixed-top -->
 	<nav class="pubs-nav">
 				<a class="pubs-nav-header" href="#">Publication Manager</a>
 			<div class="pubs-nav-bar">
 				<ul class="pubs-nav-menu">
-					<li><a href="#pubs=open">Citations</a></li>
-					<li><a href="#styles=open">Styles</a></li>
-					<li><a href="#harvest=open">Harvesting</a></li>
-					<li><a href="#help=open">Help</a></li>
+					<li><a href="#nav=pubs">Citations</a></li>
+					<li><a href="#nav=styles">Styles</a></li>
+					<li><a href="#nav=harvest">Harvesting</a></li>
+					<li><a href="#nav=help">Help</a></li>
 				</ul>
 			</div>
 		</div>
@@ -26,34 +25,34 @@
 		<div class="row">
 			<div class="col-sm-3">
 				<ul class="sidebar sidebar-citations">
-					<li><a href="#pending" class="active">Pending</a></li>
-					<li><a href="#approved">Approved</a></li>
-					<li><a href="#rejected">Rejected</a></li>
-					<li><a href="#addCitation">Add a Citation</a></li>
+					<li><a href="#pubs=pending" class="active">Pending</a></li>
+					<li><a href="#pubs=approved">Approved</a></li>
+					<li><a href="#pubs=rejected">Rejected</a></li>
+					<li><a href="#pubs=add">Add a Citation</a></li>
 				</ul>
-				<ul class="sidebar sidebar-styles">
-					<li><a href="#customStyles" class="active">Custom Citation Styles</a></li>
-					<li><a href="#addStyle">Add a Citation Style</a></li>
+				<ul class="sidebar sidebar-styles hidden">
+					<li><a href="#styles=curr" class="active">Custom Citation Styles</a></li>
+					<li><a href="#styles=add">Add a Citation Style</a></li>
 				</ul>
-				<ul class="sidebar sidebar-harvesting">
-					<li><a href="#harvestSettings" class="active">Settings</a></li>
-					<li><a href="#startHarvest">Initiate Harvest</a></li>
+				<ul class="sidebar sidebar-harvesting hidden">
+					<li><a href="#harvest=settings" class="active">Settings</a></li>
+					<li><a href="#harvest=launch">Initiate Harvest</a></li>
 				</ul>
 			</div>
 			<div class="col-sm-9 main">
 				<div class="main-citations">
 					<h1>Citations</h1>
-					<div id="citations-pending">
+					<div id="pending" class="cite-list">
 						<h2>Pending</h2>
 						<ul class="citations-pending-list">
 						</ul>
 					</div>
-					<div id="citations-approved">
+					<div id="approved" class="cite-list hidden">
 						<h2>Approved</h2>
 						<ul class="citations-pending-list">
 						</ul>
 					</div>
-					<div id="citations-rejected">
+					<div id="rejected" class="cite-list hidden">
 						<h2>Rejected</h2>
 						<ul class="citations-pending-list">
 						</ul>
@@ -71,6 +70,30 @@
     			$(this).parent('li').siblings().find('a').removeClass('active');
     			$(this).addClass('active');
     		});
+    	});
+    </script>
+    <script>
+    	var $citedivs, hash, params,
+    			anchor_map;
+
+    	anchor_map = {
+    		'nav' : 'pubs',
+    		'pubs' : 'pending'
+    	};
+    	$citedivs = $('.main-citations').find('.cite-list');
+
+    	$( window ).on('hashchange', function () {
+    		hash = location.hash;
+    		params = hash.split('=');
+    		switch ( params[0] ) {
+    			case '#nav':
+    				toggleSideBar(params[1]);
+    			break;
+    			case '#pubs':
+    				$citedivs.addClass('hidden');
+    				$('.main-citations').find('#'+params[1]).removeClass('hidden');
+    			break;
+    		}
     	});
     </script>
 </body>
