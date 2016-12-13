@@ -1,0 +1,94 @@
+.pubs-nav {
+  min-height: 50px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  top: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background-color: #222;
+  border-color: #080808;
+}
+
+.pubs-nav-header {
+  float: left;
+  height: 50px;
+  padding: 15px 15px;
+  font-size: 18px;
+  line-height: 20px;
+  color: #9d9d9d;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+}
+
+.pubs-nav-header:hover, .nav-header:focus {
+  color: #fff;
+  background-color: transparent;
+}
+
+.pubs-nav-bar {
+  border-top: 0;
+  padding-right: 0;
+  padding-left: 0;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.pubs-nav-menu {
+  float: right;
+  margin-right: -15px;
+  margin: 0;
+  list-style: none;
+}
+
+.pubs-nav-menu li {
+  float: left;
+  color: #9d9d9d;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+  padding-top: 15px;
+  padding-bottom: 15px;
+  line-height: 20px;
+  padding: 10px 15px;
+  background-color: transparent;
+}
+
+.navbar-nav-menu > li:hover,
+.navbar-nav-menu > li:focus {
+  color: #fff;
+  background-color: transparent;
+}
+
+.pubs-app {
+	padding-top: 65px;
+}
+
+.sidebar {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.sidebar > li {
+  border-radius: 4px;
+  padding: 10px 15px;
+}
+
+.sidebar > li:hover,
+.sidebar > li:focus {
+  text-decoration: none;
+  background-color: #eee;
+}
+
+.sidebar > li + li {
+  margin-top: 2px;
+  margin-left: 0;
+  /*margin-left: 2px;*/
+}
+.sidebar > li.active,
+.sidebar > li.active:hover,
+.sidebar > li.active:focus {
+  color: #fff;
+  background-color: #337ab7;
+}
