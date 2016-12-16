@@ -1,4 +1,4 @@
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+parent_dir = os.path.abspath(os.path.dirname(os.pardir))
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db/rabpubs.db')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(parent_dir, 'db/rabpubs.db')
