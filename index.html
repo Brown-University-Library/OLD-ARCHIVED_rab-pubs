@@ -5,7 +5,8 @@
 	<link rel="stylesheet" href="lib/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="css/index.css">
 	<script src="lib/jquery/jquery-3.1.1.min.js"></script>
-	<script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script src="lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<!-- 	// <script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script> -->
 </head>
 <body>
 	<nav class="pubs-nav">
@@ -24,20 +25,22 @@
     <div class="container-fluid pubs-app">
 		<div class="row">
 			<div class="col-sm-3">
-				<ul class="sidebar sidebar-citations">
-					<li><a href="#pubs=pending" class="active">Pending</a></li>
-					<li><a href="#pubs=approved">Approved</a></li>
-					<li><a href="#pubs=rejected">Rejected</a></li>
-					<li><a href="#pubs=add">Add a Citation</a></li>
-				</ul>
-				<ul class="sidebar sidebar-styles hidden">
-					<li><a href="#styles=curr" class="active">Custom Citation Styles</a></li>
-					<li><a href="#styles=add">Add a Citation Style</a></li>
-				</ul>
-				<ul class="sidebar sidebar-harvesting hidden">
-					<li><a href="#harvest=settings" class="active">Settings</a></li>
-					<li><a href="#harvest=launch">Initiate Harvest</a></li>
-				</ul>
+				<div class="sidebar">
+					<ul class="sidebar-nav nav-citations">
+						<li><a href="#pubs=pending" class="active" data-app>Pending</a></li>
+						<li><a href="#pubs=approved" data-app>Approved</a></li>
+						<li><a href="#pubs=rejected" data-app>Rejected</a></li>
+						<li><a href="#pubs=add" data-app>Add a Citation</a></li>
+					</ul>
+					<ul class="sidebar-nav nav-styles hidden">
+						<li><a href="#styles=curr" class="active">Custom Citation Styles</a></li>
+						<li><a href="#styles=add">Add a Citation Style</a></li>
+					</ul>
+					<ul class="sidebar-nav nav-harvesting hidden">
+						<li><a href="#harvest=settings" class="active">Settings</a></li>
+						<li><a href="#harvest=launch">Initiate Harvest</a></li>
+					</ul>
+				</div>
 			</div>
 			<div class="col-sm-9 main">
 				<div class="main-citations">
@@ -64,7 +67,7 @@
     <script>
     	var $anchs;
 
-    	$anchs = $(".sidebar > li > a");
+    	$anchs = $(".sidebar-nav > li > a");
     	$anchs.each( function ($li) {
     		$(this).click( function() {
     			$(this).parent('li').siblings().find('a').removeClass('active');
@@ -73,28 +76,73 @@
     	});
     </script>
     <script>
-    	var $citedivs, hash, params,
-    			anchor_map;
+    	var $navs;
 
-    	anchor_map = {
-    		'nav' : 'pubs',
-    		'pubs' : 'pending'
-    	};
-    	$citedivs = $('.main-citations').find('.cite-list');
+    	$navs = $('.pubs-nav-menu > li > a');
 
-    	$( window ).on('hashchange', function () {
-    		hash = location.hash;
-    		params = hash.split('=');
-    		switch ( params[0] ) {
-    			case '#nav':
-    				toggleSideBar(params[1]);
-    			break;
-    			case '#pubs':
-    				$citedivs.addClass('hidden');
-    				$('.main-citations').find('#'+params[1]).removeClass('hidden');
-    			break;
-    		}
+    	$navs.each( function () {
+    		$(this).click( function(e) {
+    			e.preventDefault();
+
+				var $item = $(e.currentTarget),
+				hashValue = $item.attr('href').slice(1);
+
+				if (window.location.hash) {
+					window.location.hash += '&' + hashValue;
+				}
+				else {
+					window.location.hash = '!' + hashValue;
+				}
+
+				return false;
+			});
+    		})
     	});
     </script>
+
+   //  <script>
+   //  	var $citedivs, hash, params,
+   //  			anchor_map;
+
+   //  	anchor_map = {
+   //  		'nav' : 'pubs',
+   //  		'pubs' : 'pending'
+   //  	};
+   //  	$citedivs = $('.main-citations').find('.cite-list');
+
+   //  	$sidebar = $('.sidebar');
+
+   //  	$( window ).on('hashchange', function () {
+   //  		console.log(location);
+   //  		hash = location.hash;
+   //  		params = hash.split('=');
+   //  		switch ( params[0] ) {
+   //  			case '#nav':
+   //  				toggleSideBar(params[1]);
+   //  			break;
+   //  			case '#pubs':
+   //  				$citedivs.addClass('hidden');
+   //  				$('.main-citations').find('#'+params[1]).removeClass('hidden');
+   //  			break;
+   //  		}
+   //  	});
+   //  </script>
+   //  <script>
+			// $('body').on('click', 'a[data-app]', function(e) {
+			// 	e.preventDefault();
+
+			// 	var $item = $(e.currentTarget),
+			// 	hashValue = $item.attr('href').slice(1);
+
+			// 	if (window.location.hash) {
+			// 		window.location.hash += '&' + hashValue;
+			// 	}
+			// 	else {
+			// 		window.location.hash = '!' + hashValue;
+			// 	}
+
+			// 	return false;
+			// });
+   //  </script>
 </body>
 </html>
