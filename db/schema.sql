@@ -29,21 +29,15 @@ drop table if exists harvest_records;
 create table harvest_records (
     id integer primary key autoincrement,
     user_rabid text not null,
+    venue text not null,
     title text not null,
     date text not null,
     status text not null,
-    FOREIGN KEY(user_rabid) REFERENCES users(rabid),
-    FOREIGN KEY(status) REFERENCES harvest_status(id)
-);
-
-drop table if exists harvest_status;
-create table harvest_status (
-    id integer primary key autoincrement,
-    status text not null
+    FOREIGN KEY(user_rabid) REFERENCES users(rabid)
 );
 
 drop table if exists harvest_record_exid;
-create table harvest_record_exid (
+create table harvest_record_exids (
     id integer primary key autoincrement,
     record_id text not null,
     exid text not null,
@@ -52,7 +46,7 @@ create table harvest_record_exid (
 );
 
 drop table if exists harvest_query;
-create table harvest_query (
+create table harvest_queries (
     id integer primary key autoincrement,
     rabid text not null,
     user_rabid text not null,

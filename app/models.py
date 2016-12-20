@@ -1,12 +1,12 @@
 from app import db
 
 
-class User(db.Model):
+class Users(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	short_id = db.Column(db.String(20))
 
-class Citation(db.Model):
+class Citations(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
@@ -15,29 +15,26 @@ class Citation(db.Model):
 	featured = db.Column(db.Boolean)
 	rank = db.Column(db.Integer)
 
-class CitationStyle(db.Model):
+class CitationStyles(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	template = db.Column(db.String)
 
-class HarvestRecord(db.Model):
+class HarvestRecords(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
 	title = db.Column(db.String(255))
+	venue = db.Column(db.String)
 	date = db.Column(db.String)
-	status = db.Column(db.String, db.ForeignKey('harvest_status.id'))
-
-class HarvestStatus(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
 	status = db.Column(db.String)
 
-class HarvestRecordExid(db.Model):
+class HarvestRecordExids(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	record_id = db.Column(db.String, db.ForeignKey('harvest_records.id'))
 	exid = db.Column(db.String)
 	domain = db.Column(db.String) 
 
-class HarvestQuery(db.Model):
+class HarvestQueries(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
