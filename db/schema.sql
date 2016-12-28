@@ -18,6 +18,15 @@ create table citations (
     FOREIGN KEY(style_rabid) REFERENCES citation_styles(rabid)
 );
 
+drop table if exists citation_exids;
+create table citation_exids (
+    id integer primary key autoincrement,
+    citation_id text not null,
+    exid text not null,
+    domain text not null,
+    FOREIGN KEY(citation_id) REFERENCES citations(id)
+);
+
 drop table if exists citation_styles;
 create table citation_styles (
     id integer primary key autoincrement,
@@ -36,7 +45,7 @@ create table harvest_records (
     FOREIGN KEY(user_rabid) REFERENCES users(rabid)
 );
 
-drop table if exists harvest_record_exid;
+drop table if exists harvest_record_exids;
 create table harvest_record_exids (
     id integer primary key autoincrement,
     record_id text not null,

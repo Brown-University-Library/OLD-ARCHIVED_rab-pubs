@@ -15,6 +15,12 @@ class Citations(db.Model):
 	featured = db.Column(db.Boolean)
 	rank = db.Column(db.Integer)
 
+class CitationExids(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	citation_id = db.Column(db.String, db.ForeignKey('citations.id'))
+	exid = db.Column(db.String)
+	domain = db.Column(db.String)
+
 class CitationStyles(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
