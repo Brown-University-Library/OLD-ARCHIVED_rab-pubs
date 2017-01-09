@@ -17,7 +17,7 @@ class Citations(db.Model):
 
 class CitationExids(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	citation_id = db.Column(db.String, db.ForeignKey('citations.id'))
+	citation_rabid = db.Column(db.String, db.ForeignKey('citations.rabid'))
 	exid = db.Column(db.String)
 	domain = db.Column(db.String)
 
@@ -26,22 +26,29 @@ class CitationStyles(db.Model):
 	rabid = db.Column(db.String(255))
 	template = db.Column(db.String)
 
-class HarvestRecords(db.Model):
+class HarvestExids(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
+	exid = db.Column(db.String)
+	event_id = db.Column(db.Integer, db.ForeignKey('harvest_events.id'))
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
-	title = db.Column(db.String(255))
-	venue = db.Column(db.String)
-	date = db.Column(db.String)
+	source_rabid = db.Column(db.String, db.ForeignKey('harvest_sources.rabid'))
 	status = db.Column(db.String)
 
-class HarvestRecordExids(db.Model):
+class HarvestEvents(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	record_id = db.Column(db.String, db.ForeignKey('harvest_records.id'))
-	exid = db.Column(db.String)
-	domain = db.Column(db.String) 
+	query_rabid = db.Column(db.String, db.ForeignKey('harvest_queries.rabid'))
+	event_date = db.Column(db.DateTime)
+	user_initiated = db.Column(db.Boolean)
 
 class HarvestQueries(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
-	query_string = db.Column(db.String) 
+	source_rabid = db.Column(db.String, db.ForeignKey('harvest_sources.rabid'))
+	query_string = db.Column(db.String)
+	status = db.Column(db.String)
+
+class HarvestSources(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	rabid = db.Column(db.String(255))
+	name = db.Column(db.String(255))
