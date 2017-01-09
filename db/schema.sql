@@ -1,17 +1,17 @@
 drop table if exists users;
 create table users (
     id integer primary key autoincrement,
-    rabid text not null,
+    rabid varchar not null,
     short_id text not null
 );
 
 drop table if exists citations;
 create table citations (
     id integer primary key autoincrement,
-    rabid text not null,
-    user_rabid text not null,
+    rabid varchar not null,
+    user_rabid varchar not null,
     display_string text not null,
-    style_rabid text not null,
+    style_rabid varchar not null,
     featured boolean not null,
     rank integer not null,
     FOREIGN KEY(user_rabid) REFERENCES users(rabid),
@@ -21,44 +21,62 @@ create table citations (
 drop table if exists citation_exids;
 create table citation_exids (
     id integer primary key autoincrement,
-    citation_id text not null,
-    exid text not null,
-    domain text not null,
-    FOREIGN KEY(citation_id) REFERENCES citations(id)
+    citation_rabid varchar not null,
+    exid varchar not null,
+    domain varchar not null,
+    FOREIGN KEY(citation_rabid) REFERENCES citations(rabid)
 );
 
 drop table if exists citation_styles;
 create table citation_styles (
     id integer primary key autoincrement,
-    rabid text not null,
+    rabid varchar not null,
     template text not null
 );
 
-drop table if exists harvest_records;
-create table harvest_records (
+drop table if exists harvest_exids;
+create table harvest_exids (
     id integer primary key autoincrement,
-    user_rabid text not null,
-    venue text not null,
-    title text not null,
-    date text not null,
-    status text not null,
+    exid varchar not null,
+    event_id integer not null,
+    user_rabid varchar not null,
+    source_rabid varchar not null,
+    status varchar not null,
+    FOREIGN KEY(event_id) REFERENCES harvest_events(id),
+    FOREIGN KEY(source_rabid) REFERENCES harvest_sources(rabid),
     FOREIGN KEY(user_rabid) REFERENCES users(rabid)
 );
 
-drop table if exists harvest_record_exids;
-create table harvest_record_exids (
+drop table if exists harvest_events;
+create table harvest_events (
     id integer primary key autoincrement,
-    record_id text not null,
-    exid text not null,
-    domain text not null,
-    FOREIGN KEY(record_id) REFERENCES harvest_records(id)
+    query_rabid varchar not null,
+    event_date date not null,
+    user_initiated boolean not null,
+    FOREIGN KEY(query_rabid) REFERENCES harvest_queries(rabid)
 );
 
-drop table if exists harvest_query;
+drop table if exists harvest_queries;
 create table harvest_queries (
     id integer primary key autoincrement,
-    rabid text not null,
-    user_rabid text not null,
+    rabid varchar not null,
+    user_rabid varchar not null,
+    source_rabid varchar not null,
     query_string text not null,
+    status varchar not null,
+    FOREIGN KEY(source_rabid) REFERENCES harvest_sources(rabid),
     FOREIGN KEY(user_rabid) REFERENCES users(rabid)
 );
+
+drop table if exists harvest_sources;
+create table harvest_sources (
+    id integer primary key autoincrement,
+    rabid varchar not null,
+    name varchar not null
+);
+
+create index user_rabids on users(rabid);
+create index citation_rabids on citations(rabid);
+create index style_rabids on citation_styles(rabid);
+create index query_rabids on harvest_queries(rabid);
+create index source_rabids on harvest_sources(rabid);
