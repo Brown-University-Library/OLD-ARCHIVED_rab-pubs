@@ -6,7 +6,7 @@ import os
 import json
 import sqlite3
 
-def main(tsvFile):
+def main(tsvFile, dataDir):
 
 	rabid_base = 'http://vivo.brown.edu/individual/'
 
@@ -16,7 +16,7 @@ def main(tsvFile):
 	hrv_exids = set()
 	bad_json = set()
 
-	with open(tsvFile, 'rb') as infile:
+	with open(dataDir + tsvFile, 'rb') as infile:
 		rdr = csv.reader(infile, delimiter='\t')
 		next(rdr, None)
 
@@ -45,25 +45,25 @@ def main(tsvFile):
 					cite_exids.add( (row[0], uri, tp[0], tp[1]) )
 				
 
-	with open('data/users.csv', 'wb') as userFile:
+	with open(dataDir + 'users.csv', 'wb') as userFile:
 		wrtr = csv.writer(userFile)
 		wrtr.writerows(list(users))
 
-	with open('data/citations.csv', 'wb') as citeFile:
+	with open(dataDir + 'citations.csv', 'wb') as citeFile:
 		wrtr = csv.writer(citeFile)
 		wrtr.writerows(list(citations))
 
-	with open('data/cite_exids.csv', 'wb') as exidFile:
+	with open(dataDir + 'cite_exids.csv', 'wb') as exidFile:
 		wrtr = csv.writer(exidFile)
 		wrtr.writerows(list(cite_exids))
 
-	with open('data/hrv_exids.csv', 'wb') as exidFile:
+	with open(dataDir + 'hrv_exids.csv', 'wb') as exidFile:
 		wrtr = csv.writer(exidFile)
 		wrtr.writerows(list(hrv_exids))
 
-	with open('data/bad_records.csv', 'wb') as badFile:
+	with open(dataDir + 'bad_records.csv', 'wb') as badFile:
 		wrtr = csv.writer(badFile)
 		wrtr.writerows(list(bad_json))
 
 if __name__ == "__main__":
-	main(sys.argv[1])
+	main(sys.argv[1], sys.argv[2])
