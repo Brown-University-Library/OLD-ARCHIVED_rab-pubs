@@ -11,11 +11,9 @@ def main(tsvFile):
 	rabid_base = 'http://vivo.brown.edu/individual/'
 
 	users = set()
-	citation = set()
+	citations = set()
 	cite_exids = set()
-	harvest_res = set()
 	hrv_exids = set()
-	status = set()
 	bad_json = set()
 
 	with open(tsvFile, 'rb') as infile:
@@ -23,7 +21,8 @@ def main(tsvFile):
 		next(rdr, None)
 
 		for row in rdr:
-			users.add( (rabid_base + row[1], row[1]) )
+			user = rabid_base + row[1]
+			users.add( (user, row[1]) )
 			exids= []
 			if row[2] != 'NULL':
 				exids.append( (row[2],'doi') )
@@ -33,24 +32,15 @@ def main(tsvFile):
 				exids.append( (row[4], 'wosid') )
 			try:
 				cite_data = json.loads(row[8])
-				title = cite_data['citation']['title']
-				date = cite_data['citation']['date']
-				venue = cite_data['citation']['venue']['label']
-				uri = cite_data['citation'].get('uri', 'NULL')
 			except:
 				bad_json.add( (row[0], row[5]) )
-				title = 'NULL'
-				date = 'NULL'
-				venue = 'NULL'
-				uri = 'NULL'
 			if row[5] == 'a':
-				citation.add( (row[0], rabid_base + row[1], uri) )
+				uri = cite_data['citation'].get('uri', 'NULL')
+				citations.add( (row[0], uri, user) )
 				for tp in exids:
-					cite_exids.add( (row[0], tp[0], tp[1]) )
-			else:
-				harvest_res.add( (row[0], rabid_base + row[1], title, venue, date, row[5]) )
-				for tp in exids:
-					hrv_exids.add( (row[0], tp[0], tp[1]) )
+					cite_exids.add( (row[0], uri, tp[0], tp[1]) )
+			for tp in exids:
+				hrv_exids.add( (row[0], tp[0], user, tp[1], row[5]) )
 
 	with open('users.csv', 'wb') as userFile:
 		wrtr = csv.writer(userFile)
@@ -58,15 +48,11 @@ def main(tsvFile):
 
 	with open('citations.csv', 'wb') as citeFile:
 		wrtr = csv.writer(citeFile)
-		wrtr.writerows(list(citation))
+		wrtr.writerows(list(citations))
 
 	with open('cite_exids.csv', 'wb') as exidFile:
 		wrtr = csv.writer(exidFile)
 		wrtr.writerows(list(cite_exids))
-
-	with open('harvest_records.csv', 'wb') as harvFile:
-		wrtr = csv.writer(harvFile)
-		wrtr.writerows(list(harvest_res))
 
 	with open('hrv_exids.csv', 'wb') as exidFile:
 		wrtr = csv.writer(exidFile)

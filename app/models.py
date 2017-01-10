@@ -36,16 +36,16 @@ class HarvestExids(db.Model):
 
 class HarvestEvents(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	query_rabid = db.Column(db.String, db.ForeignKey('harvest_queries.rabid'))
+	proc_rabid = db.Column(db.String, db.ForeignKey('harvest_processes.rabid'))
 	event_date = db.Column(db.DateTime)
 	user_initiated = db.Column(db.Boolean)
 
-class HarvestQueries(db.Model):
+class HarvestProcesses(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
 	source_rabid = db.Column(db.String, db.ForeignKey('harvest_sources.rabid'))
-	query_string = db.Column(db.String)
+	process_data = db.Column(db.String)
 	status = db.Column(db.String)
 
 class HarvestSources(db.Model):

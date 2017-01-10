@@ -50,19 +50,19 @@ create table harvest_exids (
 drop table if exists harvest_events;
 create table harvest_events (
     id integer primary key autoincrement,
-    query_rabid varchar not null,
+    proc_rabid varchar not null,
     event_date date not null,
     user_initiated boolean not null,
-    FOREIGN KEY(query_rabid) REFERENCES harvest_queries(rabid)
+    FOREIGN KEY(proc_rabid) REFERENCES harvest_proc(rabid)
 );
 
-drop table if exists harvest_queries;
-create table harvest_queries (
+drop table if exists harvest_processes;
+create table harvest_processes (
     id integer primary key autoincrement,
     rabid varchar not null,
     user_rabid varchar not null,
     source_rabid varchar not null,
-    query_string text not null,
+    process_data text not null,
     status varchar not null,
     FOREIGN KEY(source_rabid) REFERENCES harvest_sources(rabid),
     FOREIGN KEY(user_rabid) REFERENCES users(rabid)
@@ -78,5 +78,5 @@ create table harvest_sources (
 create index user_rabids on users(rabid);
 create index citation_rabids on citations(rabid);
 create index style_rabids on citation_styles(rabid);
-create index query_rabids on harvest_queries(rabid);
+create index proc_rabids on harvest_processes(rabid);
 create index source_rabids on harvest_sources(rabid);
