@@ -1,10 +1,6 @@
-"https://pymotw.com/2/sqlite3/"
-
 import sys
 import csv
-import os
 import json
-import sqlite3
 
 def main(tsvFile, dataDir):
 
@@ -27,13 +23,13 @@ def main(tsvFile, dataDir):
 			if row[2] != 'NULL':
 				exids.append( (row[2],'doi') )
 				if row[3] == 'NULL' and row[4] == 'NULL':
-					hrv_exids.add( (row[2], user, 'aa', row[5]) )
+					hrv_exids.add( (row[2], user, 'Academic Analytics', row[5]) )
 			if row[3] != 'NULL':
 				exids.append( (row[3], 'pmid') )
-				hrv_exids.add( (row[3], user, 'pubmed', row[5]) )
+				hrv_exids.add( (row[3], user, 'PubMed', row[5]) )
 			if row[4] != 'NULL':
 				exids.append( (row[4], 'wosid') )
-				hrv_exids.add( (row[4], user, 'wos', row[5]) )
+				hrv_exids.add( (row[4], user, 'Web of Science', row[5]) )
 			try:
 				cite_data = json.loads(row[8])
 			except:

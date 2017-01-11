@@ -6,6 +6,7 @@ import os
 
 vivo_base = "http://vivo.brown.edu/individual/"
 curr_dir = os.path.dirname(os.path.realpath(__file__))
+dataDir = os.path.join(curr_dir, 'data/')
 
 def main():
 	pubmed = HarvestSources()
@@ -25,7 +26,7 @@ def main():
 
 	db.session.commit()
 
-	with open(curr_dir + 'data/users.csv','rb') as users:
+	with open(dataDir + 'users.csv','rb') as users:
 		reader = csv.reader(users)
 		pbmd = HarvestSources.query.filter_by(name="PubMed").first()
 		web = HarvestSources.query.filter_by(name="Web of Science").first()
