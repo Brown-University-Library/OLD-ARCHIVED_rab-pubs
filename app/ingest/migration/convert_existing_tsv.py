@@ -2,7 +2,7 @@ import sys
 import csv
 import json
 
-def main(tsvFile, dataDir):
+def main(dataDir, tsvFile):
 
 	rabid_base = 'http://vivo.brown.edu/individual/'
 
@@ -12,7 +12,7 @@ def main(tsvFile, dataDir):
 	hrv_exids = set()
 	bad_json = set()
 
-	with open(dataDir + tsvFile, 'rb') as infile:
+	with open(tsvFile, 'rb') as infile:
 		rdr = csv.reader(infile, delimiter='\t')
 		next(rdr, None)
 

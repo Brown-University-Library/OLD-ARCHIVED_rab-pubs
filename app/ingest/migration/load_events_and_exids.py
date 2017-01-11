@@ -1,15 +1,13 @@
 from app import db
-from app.models import HarvestEvents, HarvestProcesses, HarvestSources
+from app.models import HarvestExids, HarvestEvents, HarvestProcesses, HarvestSources
 
 from collections import defaultdict
 import csv
-import os
+import sys
 from datetime import datetime
 
-curr_dir = os.path.dirname(os.path.realpath(__file__))
-dataDir = os.path.join(curr_dir, 'data/')
 
-def main():
+def main(exIdFile):
 	srcs = HarvestSources.query.all()
 	src_rabids_map = { src.rabid: src.name for src in srcs }
 	src_names_map = { src.name: src.rabid for src in srcs }
@@ -36,22 +34,26 @@ def main():
 		src_name = proc_src_map[event.proc_rabid]
 		user_event_map[user_rabid][src_name] = event.id
 
-	rows = []
-	with open(dataDir + 'hrv_exids.csv','rb') as exids:
+	# rows = []
+	with open(exIdFile,'rb') as exids:
 		reader = csv.reader(exids)
 
 		for row in reader:
-			exid = row[0]
-			event_id = user_event_map[row[1]][row[2]]
-			user_rabid = row[1]
-			source_rabid = src_names_map[row[2]]
-			status = row[3]
+			hrv = HarvestExids()
+			hrv.exid = row[0]
+			hrv.event_id = user_event_map[row[1]][row[2]]
+			hrv.user_rabid = row[1]
+			hrv.source_rabid = src_names_map[row[2]]
+			hrv.status = row[3]
+			db.session.add(hrv)
 
-			rows.append( ( exid, event_id, user_rabid, source_rabid, status) )
+		db.session.commit()
+
+			#rows.append( ( exid, event_id, user_rabid, source_rabid, status) )
 			
-	with open(dataDir + 'wrapped_hrv_exids.csv', 'wb') as f:
-		writer = csv.writer(f)
-		writer.writerows(rows)
+	# with open(dataDir + 'wrapped_hrv_exids.csv', 'wb') as f:
+	# 	writer = csv.writer(f)
+	# 	writer.writerows(rows)
 
 if __name__ == '__main__':
-	main()
+	main(sys.argv[1])

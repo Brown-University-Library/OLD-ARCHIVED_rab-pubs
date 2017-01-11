@@ -2,13 +2,11 @@ from app import db
 from app.models import Users, HarvestSources, HarvestProcesses
 import uuid
 import csv
-import os
+import sys
 
 vivo_base = "http://vivo.brown.edu/individual/"
-curr_dir = os.path.dirname(os.path.realpath(__file__))
-dataDir = os.path.join(curr_dir, 'data/')
 
-def main():
+def main(userFile):
 	pubmed = HarvestSources()
 	pubmed.rabid = vivo_base + uuid.uuid4().hex
 	pubmed.name = "PubMed"
@@ -26,7 +24,7 @@ def main():
 
 	db.session.commit()
 
-	with open(dataDir + 'users.csv','rb') as users:
+	with open(userFile,'rb') as users:
 		reader = csv.reader(users)
 		pbmd = HarvestSources.query.filter_by(name="PubMed").first()
 		web = HarvestSources.query.filter_by(name="Web of Science").first()
@@ -65,4 +63,4 @@ def main():
 		db.session.commit()
 
 if __name__ == '__main__':
-	main()
+	main(sys.argv[1])
