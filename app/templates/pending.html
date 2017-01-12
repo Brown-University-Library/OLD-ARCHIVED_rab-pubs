@@ -12,10 +12,14 @@
   </head>
   <body>
       <h1>{{ user.rabid }}</h1>
-      <ol>
-        {% for exid in exids %}
-          <li>{{ exid.event.process.source.name }}</li>
+        {% for source, exids in sources.items() %}
+          <div>
+            <h2>{{ source }}</h2>
+              <ol>
+                {% for exid in exids %}
+                  <li>{{ exid.exid }}</li>
+                {% endfor %}
+              </ol>
         {% endfor %}
-      </ol>
   </body>
 </html>
