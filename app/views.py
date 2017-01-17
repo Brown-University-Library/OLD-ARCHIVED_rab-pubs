@@ -22,9 +22,9 @@ def harvested_publications(short_id):
 		source_map[ exid.event.process.source_rabid ].append(exid.exid)
 	out = {}
 	for source in sources:
-		if source.name == 'PubMed':
+		if source.name == 'PubMed' and len(source_map[source.rabid]) != 0:
 			out['Pubmed'] = pmids.get_details(source_map[source.rabid])
-		if source.name == 'Academic Analytics':
+		if source.name == 'Academic Analytics' and len(source_map[source.rabid]) != 0:
 			out['Academic Analytics'] = dois.get_details(source_map[source.rabid])
 	return render_template('pending.html',
 							user=user,

@@ -8,7 +8,8 @@ def request_crossref(doiChunk):
 	# https://github.com/kennethreitz/requests/issues/1186
 	params['doi'] = doiChunk
 	resp = requests.get( crossref_base, params=params )
-	tree = ET.fromstring(resp.text)
+	# Figure out a better way?
+	tree = ET.fromstring(resp.text.encode('utf-8'))
 	out = []
 	for meta_tree in tree.findall('doi_record/crossref/journal'):
 		lookup_obj = { "display": None, "exid": None, "meta": None }
