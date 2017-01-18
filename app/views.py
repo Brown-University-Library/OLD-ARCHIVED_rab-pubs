@@ -2,7 +2,7 @@ from flask import render_template
 from app import app
 from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
 
-from app.lookup import dois, pmids
+from app.lookup import dois, pmids, wosids
 
 @app.route('/')
 @app.route('/rabpubs')
@@ -26,6 +26,8 @@ def harvested_publications(short_id):
 			out['Pubmed'] = pmids.get_details(source_map[source.rabid])
 		if source.name == 'Academic Analytics' and len(source_map[source.rabid]) != 0:
 			out['Academic Analytics'] = dois.get_details(source_map[source.rabid])
+		if source.name == 'Web of Science' and len(source_map[source.rabid]) != 0:
+			out['Web of Science'] = wosids.get_details(source_map[source.rabid])
 	return render_template('pending.html',
 							user=user,
 							sources=out)	
