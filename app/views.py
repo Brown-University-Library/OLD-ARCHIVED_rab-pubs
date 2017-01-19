@@ -1,8 +1,14 @@
+import datetime
+
 from flask import render_template
 from app import app
 from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
 
 from app.lookup import dois, pmids, wosids
+from app.utils import wos
+
+wos_session = wos.Session()
+wos_session.authenticate()
 
 @app.route('/')
 @app.route('/rabpubs')
@@ -16,7 +22,7 @@ def index():
 def harvested_publications(short_id):
 	user = Users.query.filter_by(short_id=short_id).first()
 	sources = HarvestSources.query.all()
-	exids = HarvestExids.query.filter_by(user_rabid=user.rabid).all()
+	exids = HarvestExids.query.filter_by(user_rabid=user.rabid, status='p').all()
 	source_map = { source.rabid: []  for source in sources }
 	for exid in exids:
 		source_map[ exid.event.process.source_rabid ].append(exid.exid)
@@ -27,7 +33,9 @@ def harvested_publications(short_id):
 		if source.name == 'Academic Analytics' and len(source_map[source.rabid]) != 0:
 			out['Academic Analytics'] = dois.get_details(source_map[source.rabid])
 		if source.name == 'Web of Science' and len(source_map[source.rabid]) != 0:
-			out['Web of Science'] = wosids.get_details(source_map[source.rabid])
+			sid = wos_session.get_sid()
+			print sid
+			out['Web of Science'] = wosids.get_details(source_map[source.rabid], sid)
 	return render_template('pending.html',
 							user=user,
 							sources=out)	

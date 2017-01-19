@@ -31,8 +31,8 @@ def request_crossref(doiChunk):
 
 def get_details(doiList):
 	out = []
-	for i in range(0, len(doiList), 30):
-		doiChunk = doiList[i:i+30]
+	for i in range(0, len(doiList), 50):
+		doiChunk = doiList[i:i+50]
 		lookup = request_crossref(doiChunk)
 		out.extend(lookup)
 	return out
