@@ -19,8 +19,10 @@ def pending(short_id):
 	exids_by_source = { source.rabid: []  for source in sources }
 	for exid in exids:
 		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
-	exid_counts_by_source = { source.name: len(exids_by_source[source.rabid])
-								for source in sources }
+	exid_counts_by_source = { source.rabid[33:]: {
+								'name': source.name,
+								'count': len(exids_by_source[source.rabid])
+								} for source in sources }
 	return render_template('pending.html',
 							user=user,
 							counts=exid_counts_by_source)
