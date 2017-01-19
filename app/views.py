@@ -8,24 +8,25 @@ from app.lookup import dois, pmids, wosids
 from app.utils import wos
 
 wos_session = wos.Session()
-wos_session.authenticate()
+# wos_session.authenticate()
 
-@app.route('/')
-@app.route('/rabpubs')
-def index():
-    user = {'nickname': 'Steve'}  # fake user
-    return render_template('base.html',
-                           title='Publictaions',
-                           user=user)
 
 @app.route('/rabpubs/<short_id>/pending')
-def harvested_publications(short_id):
+def pending(short_id):
 	user = Users.query.filter_by(short_id=short_id).first()
 	sources = HarvestSources.query.all()
 	exids = HarvestExids.query.filter_by(user_rabid=user.rabid, status='p').all()
-	source_map = { source.rabid: []  for source in sources }
+	exids_by_source = { source.rabid: []  for source in sources }
 	for exid in exids:
-		source_map[ exid.event.process.source_rabid ].append(exid.exid)
+		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
+	exid_counts_by_source = { source.name: len(exids_by_source[source.rabid])
+								for source in sources }
+	return render_template('pending.html',
+							user=user,
+							counts=exid_counts_by_source)
+
+@app.route('/rabpubs/<short_id>/pending_meta')
+def get_pending_metadata(short_id):
 	out = {}
 	for source in sources:
 		if source.name == 'PubMed' and len(source_map[source.rabid]) != 0:

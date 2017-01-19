@@ -9,17 +9,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}">
     <script src="{{ url_for('static', filename='jquery/jquery-3.1.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
   </head>
   <body>
       <h1>{{ user.rabid }}</h1>
-        {% for source, exids in sources.items() %}
+        {% for source, count in counts.items() %}
           <div>
-            <h2>{{ source }}</h2>
-              <ol>
-                {% for exid in exids %}
-                  <li>{{ exid.display }}</li>
-                {% endfor %}
-              </ol>
+            <h2>{{ source }} <span class="badge badge-pill badge-success">{{ count }}</span></h2>
         {% endfor %}
   </body>
 </html>
