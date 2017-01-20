@@ -37,6 +37,7 @@
 
           var lister = function( jsonData, target ) {
             var items = [];
+            console.log(jsonData);
             $.each( jsonData, function( i, val ) {
               items.push( '<li class="list-group-item">' + val + '</li>' );
             });
@@ -92,7 +93,7 @@
               });
             }
           })();
-          
+
         });
       </script>
   </body>
