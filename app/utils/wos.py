@@ -1,5 +1,5 @@
 import zeep
-import datetime
+from datetime import datetime, timedelta
 import threading
 
 class Session(object):
@@ -7,23 +7,21 @@ class Session(object):
 	def __init__(self):
 		self.wsdl = 'http://search.webofknowledge.com/esti/wokmws/ws/WOKMWSAuthenticate?wsdl'
 		self.client = zeep.Client(wsdl=self.wsdl)
-		self.timer = None
+		self.last_updated = None
 		self.sid = None
 
 	def authenticate(self):
 		self.sid = self.client.service.authenticate()
-		self.timer = threading.Timer( 1200, self.close )
-		self.timer.start()
+		self.last_updated = datetime.now()
 
 	def close(self):
 		self.client.service.closeSession()
 
 	def get_sid(self):
-		time_now = datetime.datetime.now()
-		if self.timer.is_alive:
-			self.timer.cancel()
-			self.timer.start()
+		time_now = datetime.now()
+		if time_now - self.last_updated < timedelta(minutes=55):
 			return self.sid
 		else:
+			self.close()
 			self.authenticate()
 			return self.sid

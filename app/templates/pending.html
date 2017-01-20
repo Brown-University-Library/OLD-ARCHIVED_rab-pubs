@@ -11,7 +11,7 @@
     <script src="{{ url_for('static', filename='jquery/jquery-ui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
   </head>
-  <body>
+  <body data-shortid="{{ user.short_id }}">
       <h1>{{ user.rabid }}</h1>
         {% for source, data in counts.items() %}
           <div>
@@ -24,14 +24,76 @@
                     </a>
                   </h4>
                 </div>
-                <div id="{{ source }}-pending-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ source }}-pending-collapse">
-                  <div class="panel-body">
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                  </div>
+                <div id="{{ source }}-pending-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ source }}-pending-collapse" data-pending-count="{{ data.count }}">
                 </div>
               </div>
             </div>
           </div>
         {% endfor %}
+      <script>
+        $(document).ready(function(){
+
+          var shortid = $('body').data('shortid');
+
+          var lister = function( jsonData, target ) {
+            var items = [];
+            $.each( jsonData, function( i, val ) {
+              items.push( '<li class="list-group-item">' + val + '</li>' );
+            });
+
+            $( "<ol/>", {
+              class: "list-group",
+              html: items.join( "" )
+            }).appendTo( target );
+          };
+
+
+          (function() {
+            var target = '#1b404f6f24b449688bed96f0b2587d4d-pending-collapse';
+            var count = $(target).data('pending-count');
+            if (count > 0) {
+              $.ajax({
+                dataType: "json",
+                crossDomain: true,
+                url: 'http://localhost:8000/rabpubs/' + shortid + '/pending/pubmed',
+                success: function( data ) {
+                  lister( data, target );
+                }
+              });
+            }
+          })();
+
+          (function() {
+            var target = '#70209659b6af4980b17ef39884160406-pending-collapse';
+            var count = $(target).data('pending-count');
+            if (count > 0) {
+              $.ajax({
+                dataType: "json",
+                crossDomain: true,
+                url: 'http://localhost:8000/rabpubs/' + shortid + '/pending/wos',
+                success:  function( data ) {
+                  lister( data, target );
+                }
+              });
+            }
+          })();
+
+          (function() {
+            var target = '#c53746b63fe848bbac0a1ac0bf559b27-pending-collapse';
+            var count = $(target).data('pending-count');
+            if (count > 0) {
+              $.ajax({
+                dataType: "json",
+                crossDomain: true,
+                url: 'http://localhost:8000/rabpubs/' + shortid + '/pending/academic_analytics',
+                success: function( data ) {
+                  lister( data, target );
+                }
+              });
+            }
+          })();
+          
+        });
+      </script>
   </body>
 </html>
