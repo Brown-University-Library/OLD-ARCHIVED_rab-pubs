@@ -13,7 +13,10 @@ class WosResult( object ):
 			self.exid = meta['uid']
 		except:
 			raise ValueError('WOS result missing uid')
-		self.data = { 'source': self.source, 'exid': self.exid }
+		self.data = { 	'source': self.source,
+						'exid': self.exid,
+						'ids' : { 'wos' : self.exid }
+					}
 		try:
 			self.data['title'] = meta['title'][0]['value'][0]
 		except:
@@ -37,28 +40,31 @@ class WosResult( object ):
 				self.data['date']['year'] = src['value'][0]
 			if src['label'] == 'Published.BiblioYear' and len(src['value']) != 0:
 				self.data['date']['date'] = src['value'][0]
+
+		self.data['authors'] = {}
 		try:
-			authors = meta['authors'][0]['value'][0]
-			self.data['authors'] = {}
+			authors = meta['authors'][0]['value']
 			self.data['authors']['list'] = authors
-			self.data['authors']['string'] = authors.join(', ')
+			self.data['authors']['string'] = ', '.join(authors)
 		except:
-			self.data['authors'] = ''
+			pass
+
+		self.data['keywords'] = {}
 		try:
-			keywords = meta['keywords'][0]['value'][0]
-			self.data['keywords'] = {}
+			keywords = meta['keywords'][0]['value']
 			self.data['keywords']['list'] = keywords
-			self.data['keywords']['string'] = keywords.join(', ')
+			self.data['keywords']['string'] = ', '.join(keywords)
 		except:
-			self.data['keywords'] = ''
+			pass
+
 		for other in meta['other']:
 			if src['label'] == 'Identifier.Doi' and len(other['value']) != 0:
-				self.data['doi'] = other['value'][0]
+				self.data['ids']['doi'] = other['value'][0]
 			if src['label'] == 'Identifier.Issn' and len(other['value']) != 0:
-				self.data['venue']['issn'] = src['value'][0]
+				self.data['venue']['issn'] = other['value'][0]
 
 	def json(self):
-		json.dumps(self.data)
+		return json.dumps(self.data)
 
 def get_details(wosidList, sid):
 	### !!!!Need to handle MEDLINE: ids
@@ -79,24 +85,4 @@ def get_details(wosidList, sid):
 		for rec in resp['records']:
 			wos_res = WosResult(rec)
 			out.append(wos_res)
-	# 		exid = rec['uid']
-	# 		title = rec['title'][0]['value'][0]
-	# 		for src in rec['source']:
-	# 			if src['label'] == 'SourceTitle':
-	# 				pub = src['value'][0]
-	# 			if src['label'] == 'Published.BiblioYear':
-	# 				pubdate = src['value'][0]
-	# 		try:
-	# 			display = "{0} {1} {2}".format(title, pub, pubdate)
-	# 		except:
-	# 			print "Could not format: " + str(exid)
-	# 		lookup_obj = {}
-	# 		meta = list()
-	# 		meta.extend(rec['source'])
-	# 		meta.extend(rec['authors'])
-	# 		meta.extend(rec['keywords'])
-	# 		lookup_obj['meta'] = meta
-	# 		lookup_obj['display'] = display
-	# 		lookup_obj['exid'] = exid
-	# 		out.append(lookup_obj)
 	return out
