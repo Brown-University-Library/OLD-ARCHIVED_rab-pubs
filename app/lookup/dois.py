@@ -79,22 +79,7 @@ def request_crossref(doiChunk):
 	out = []
 	for meta_tree in tree.findall('doi_record/crossref/journal'):
 		crossref_result = CrossRefResult(meta_tree)
-		out.append(crossref_result)
-		# lookup_obj = { "display": None, "exid": None, "meta": None }
-		# meta = meta_tree.text
-		# doi = meta_tree.find('journal_article/doi_data/doi').text
-		# title = meta_tree.find('journal_article/titles/title').text
-		# pubdate = meta_tree.find('journal_issue/publication_date/year').text
-		# pub = meta_tree.find('journal_metadata/full_title').text
-		# try:
-		# 	display = "{0} {1} {2}".format(title, pub, pubdate)
-		# except:
-		# 	print "Could not format: " + str(doi)
-		# 	continue
-		# lookup_obj['display'] = display
-		# lookup_obj['meta'] = meta
-		# lookup_obj['exid'] = doi
-		# out.append(lookup_obj)		
+		out.append(crossref_result)	
 	return out
 
 def get_details(doiList):
