@@ -35,11 +35,11 @@
 
           var shortid = $('body').data('shortid');
 
-          var lister = function( jsonData, target ) {
+          var lister = function( jsonList, target ) {
             var items = [];
-            console.log(jsonData);
-            $.each( jsonData, function( i, val ) {
-              items.push( '<li class="list-group-item">' + val + '</li>' );
+            $.each( jsonList, function( i, jData ) {
+              var jDict = JSON.parse(jData);
+              items.push( '<li class="list-group-item" data-source="' + jDict.source + '" data-exid="' + jDict.exid + '">' + jDict.title + ' <em>' + jDict.venue.abbrv + '</em> ' + jDict.date.fulldate + '</li>' );
             });
 
             $( "<ol/>", {

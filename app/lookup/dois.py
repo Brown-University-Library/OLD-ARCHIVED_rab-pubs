@@ -26,6 +26,7 @@ class CrossRefResult( object ):
 		self.data['date'] = {}
 		try:
 			self.data['date']['year'] = meta.find('journal_issue/publication_date/year').text
+			self.data['date']['fulldate'] = self.data['date']['year']
 		except:
 			pass
 
@@ -33,7 +34,7 @@ class CrossRefResult( object ):
 		try:
 			jrn_meta = meta.find('journal_metadata')
 			self.data['venue']['name'] = jrn_meta.find('full_title').text
-			self.data['venue']['abrv'] = jrn_meta.find('abbrev_title').text
+			self.data['venue']['abbrv'] = jrn_meta.find('abbrev_title').text
 			self.data['venue']['issn'] = jrn_meta.find('issn').text
 		except:
 			pass
@@ -59,8 +60,11 @@ class CrossRefResult( object ):
 		self.data['venue']['pages'] = {}
 		try:
 			pages_meta = meta.find('journal_article/pages')
-			self.data['venue']['pages']['start'] = pages_meta.find('first_page').text
-			self.data['venue']['pages']['end'] = pages_meta.find('last_page').text
+			start = pages_meta.find('first_page').text
+			end = pages_meta.find('last_page').text
+			self.data['venue']['pages']['start'] = start
+			self.data['venue']['pages']['end'] = end
+			self.data['venue']['pages']['range'] = start + "-" + end
 		except:
 			pass
 

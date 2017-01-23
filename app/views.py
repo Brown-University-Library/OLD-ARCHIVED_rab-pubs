@@ -37,7 +37,7 @@ def get_pending_academic_analytics(short_id):
 				source_rabid=src_rabid,
 				status='p').all()
 	lookups = dois.get_details([ exid.exid for exid in exids])
-	display = [ lookup['display'] for lookup in lookups ]
+	display = [ lookup.json() for lookup in lookups ]
 	return json.dumps(display)
 
 @app.route('/rabpubs/<short_id>/pending/pubmed')
@@ -49,7 +49,7 @@ def get_pending_pubmed(short_id):
 				source_rabid=src_rabid,
 				status='p').all()
 	lookups = pmids.get_details([ exid.exid for exid in exids ])
-	display = [ lookup['display'] for lookup in lookups ]
+	display = [ lookup.json() for lookup in lookups ]
 	return json.dumps(display)
 
 @app.route('/rabpubs/<short_id>/pending/wos')
@@ -62,5 +62,5 @@ def get_pending_wos(short_id):
 				status='p').all()
 	sid = wos_session.get_sid()
 	lookups = wosids.get_details([ exid.exid for exid in exids ], sid)
-	display = [ lookup['display'] for lookup in lookups ]
+	display = [ lookup.json() for lookup in lookups ]
 	return json.dumps(display)

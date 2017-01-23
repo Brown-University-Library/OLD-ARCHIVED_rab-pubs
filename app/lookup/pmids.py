@@ -23,18 +23,18 @@ class PubMedResult( object ):
 
 		self.data['date'] = {}
 		try:
-			self.data['date']['date'] = meta['pubdate']
+			self.data['date']['fulldate'] = meta['pubdate']
 		except:
 			pass
 
-		self.data['venue'] = {}
+		self.data['venue'] = { 'pages': {} }
 		try:
 			self.data['venue']['name'] = meta['fulljournalname']
 			self.data['venue']['abbrv'] = meta['source']
 			self.data['venue']['issn'] = meta['issn']
 			self.data['venue']['volume'] = meta['volume']
 			self.data['venue']['issue'] = meta['issue']
-			self.data['venue']['pages'] = meta['pages']
+			self.data['venue']['pages']['range'] = meta['pages']
 		except:
 			pass
 
@@ -45,6 +45,9 @@ class PubMedResult( object ):
 			self.data['authors']['string'] = ', '.join(auth_list)
 		except:
 			pass
+
+	def json(self):
+		return json.dumps(self.data)
 
 def get_details(pmidList):
 	esumm_base = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi'
