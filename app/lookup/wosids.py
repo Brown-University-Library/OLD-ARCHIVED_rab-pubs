@@ -26,7 +26,7 @@ class WosResult( object ):
 		except:
 			raise ValueError('WOS result missing source')
 		self.data['venue'] = { 'pages' : {} }
-		self.data['date'] = {}
+		self.data['date'] = { 'fulldate' : 'None'}
 		for src in resp_srcs:
 			if src['label'] == 'SourceTitle' and len(src['value']) != 0:
 				self.data['venue']['name'] = src['value'][0]
@@ -38,9 +38,14 @@ class WosResult( object ):
 			if src['label'] == 'Pages' and len(src['value']) != 0:
 				self.data['venue']['pages']['range'] = src['value'][0]
 			if src['label'] == 'Published.BiblioDate' and len(src['value']) != 0:
-				self.data['date']['year'] = src['value'][0]
+				self.data['date']['detail'] = src['value'][0]
 			if src['label'] == 'Published.BiblioYear' and len(src['value']) != 0:
-				self.data['date']['fulldate'] = src['value'][0] + ' ' + self.data['date']['year']
+				self.data['date']['year'] = src['value'][0]
+				self.data['date']['fulldate'] = src['value'][0]
+		detail = self.data['date'].get('detail', None)
+		year = self.data['date'].get('year', None)
+		if detail and year:
+			self.data['date']['fulldate'] = detail + ' ' + year
 
 		self.data['authors'] = {}
 		try:
