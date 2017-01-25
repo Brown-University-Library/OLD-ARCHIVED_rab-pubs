@@ -9,23 +9,37 @@ harvest.model = (function () {
 		pending,		
 		initModule;
 
-	update = (function ( data, source ) {
-		stateMap[source] = data;
-	});
+	pending_db = TAFFY();
+
+	update = function ( data, source ) {
+		data.forEach( function ( pendingStr ) {
+			pendingObj = JSON.parse(pendingStr);
+			pendingObj.source = source;
+			pending_db.insert( pendingObj );
+		})
+	};
 
 	pending = (function () {
 		var
 			get_pending;
 
-		get_pending = function ( source ) {
+		get = function ( paramObj ) {
 			var data;
 
-			data = stateMap[source];
+			data = pending_db( paramObj ).first();
 			return data;
 		};
 
+		all = function ( paramObj ) {
+			var data;
+
+			data = pending_db( paramObj ).get();
+			return data;
+		}
+
 		return {
-			get_pending : get_pending
+			get : get,
+			all : all
 		}
 	}());
 

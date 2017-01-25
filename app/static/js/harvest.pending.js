@@ -10,13 +10,19 @@ harvest.pending = (function() {
       jqueryMap = {},
 
       loadPending, makePendingList,
+
+      onClickPendingDetailsModal,
       setJqueryMap, initModule;
 
 
     setJqueryMap = function() {
       var 
         $sources = $('.api-source');
-        jqueryMap['sources'] = {};
+        jqueryMap = {
+          'sources' : {},
+          $modal : $('#modalDetails'),
+          $table : $('#detailsTable'),
+        };
 
       $.each($sources, function( i, source ) {
         var rabid = $( this ).data('rabid');
@@ -29,21 +35,36 @@ harvest.pending = (function() {
     makePendingList = function( jsonList ) {
       var list_items = [];
 
-      jsonList.forEach( function( pendingStr ) {
-        var pendingObj = JSON.parse(pendingStr);
-        var $li = $('<li/>', { 'class'       : 'list-group-item',
+      jsonList.forEach( function( pendingObj ) {
+        var pendingObj,
+            $li, $title, $venue, $date, $modal_btn;
+
+        $li = $('<li/>', {  'class'       : 'list-group-item',
                             'data-source' : pendingObj.source,
                             'data-exid'   : pendingObj.exid,
-                            });
-        var $title = $('<span/>', {  'class' : 'pending-title',
-                                  'text'  : pendingObj.title });
-        var $venue = $('<span/>', {  'class' : 'pending-venue',
-                                  'text'  : pendingObj.venue.abbrv });
-        var $date = $('<span/>', { 'class' : 'pending-date',
+                          });
+        $title = $('<span/>', { 'class' : 'pending-title',
+                                'text'  : pendingObj.title });
+        $venue = $('<span/>', { 'class' : 'pending-venue',
+                                'text'  : pendingObj.venue.abbrv });
+        $date = $('<span/>', {  'class' : 'pending-date',
                                 'text'  : pendingObj.date.fulldate });
+        $modal_btn = $('<button/>', { 'type'        : 'button',
+                                      'class'       : 'btn btn-primary details-modal',
+                                      'data-exid'   : pendingObj.exid
+                                    });
+
+        $modal_btn.on('click', function(e) {
+          e.preventDefault();
+
+          var exid = $( this ).data('exid');
+          onClickPendingDetailsModal( exid );
+        });
+
         $li.append($title);
         $li.append($venue);
         $li.append($date);
+        $li.append($modal_btn);
 
         list_items.push( $li );
       });
@@ -55,7 +76,7 @@ harvest.pending = (function() {
       var sourceData,
         $lis, $ul, $target;
 
-        sourceData = configMap.pending_model.get_pending( source );
+        sourceData = configMap.pending_model.all( {'source' : source} );
         $lis = makePendingList( sourceData );
         $ol = $('<ol/>', {'class' : 'list-group'});
         $lis.forEach( function($li) {
@@ -64,6 +85,28 @@ harvest.pending = (function() {
 
         $target = jqueryMap.sources[ source ];
         $target.append($ol);     
+    };
+
+    onClickPendingDetailsModal = function ( exid ) {
+      var $modal, $table, details;
+      
+      $modal = jqueryMap.$modal;
+      $table = jqueryMap.$table;
+      $table.empty();
+
+      details = configMap.pending_model.get( {'exid' : exid.toString() });
+      for (var key in details) {
+        if (details.hasOwnProperty(key)) {
+          $tr = $('<tr/>');
+          $key = $('<td/>', {'text' : key });
+          $value = $('<td/>', {'text' : details[key]});
+
+          $tr.append($key);
+          $tr.append($value);
+          $table.append($tr);
+        }
+      }
+      $modal.modal('show');
     };
 
     configModule = function ( map ) {

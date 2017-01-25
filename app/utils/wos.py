@@ -22,6 +22,6 @@ class Session(object):
 		if time_now - self.last_updated < timedelta(minutes=55):
 			return self.sid
 		else:
-			self.close()
+			# self.close()
 			self.authenticate()
 			return self.sid
