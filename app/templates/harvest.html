@@ -1,0 +1,47 @@
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>Publication Manager</title>
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}">
+    <script src="{{ url_for('static', filename='jquery/jquery-3.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/harvest.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/harvest.data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/harvest.model.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/harvest.shell.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='js/harvest.queries.js') }}"></script> -->
+    <script src="{{ url_for('static', filename='js/harvest.pending.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/harvest.modal.js') }}"></script>
+
+  </head>
+  <body data-shortid="{{ user.short_id }}">
+      <h1>{{ user.rabid }}</h1>
+        {% for source, data in counts.items() %}
+          <div class="api-source" data-rabid="{{ source }}">
+            <h2>{{ data.name }}</h2>
+            <div class="panel-group" id="{{ source }}-accordion" role="tablist" aria-multiselectable="true">
+              <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="{{ source }}-pending">
+                  <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ source }}-pending-collapse" aria-expanded="true" aria-controls="{{ source }}-pending-collapse">Pending <span class="badge">{{ data.count }}</span>
+                    </a>
+                  </h4>
+                </div>
+                <div id="{{ source }}-pending-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ source }}-pending-collapse" data-pending-count="{{ data.count }}">
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      <script>
+        $( document ).ready(function() {
+          harvest.initModule( $('body') );
+        });
+      </script>
+  </body>
+</html>

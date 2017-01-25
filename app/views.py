@@ -24,7 +24,7 @@ def pending(short_id):
 								'name': source.name,
 								'count': len(exids_by_source[source.rabid])
 								} for source in sources }
-	return render_template('pending.html',
+	return render_template('harvest.html',
 							user=user,
 							counts=exid_counts_by_source)
 
