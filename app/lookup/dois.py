@@ -2,10 +2,13 @@ import json
 import requests
 import xml.etree.ElementTree as ET
 
-class CrossRefResult( object ):
+from utils import Lookup
 
-	def __init__(self, meta):
-		self.prep(meta)
+#############################
+###### CrossRef Result ######
+#############################
+
+class CrossRefResult( Lookup ):
 
 	def prep(self, meta):
 		self.source = 'crossref'
@@ -14,63 +17,93 @@ class CrossRefResult( object ):
 			self.exid = doi
 		except:
 			raise ValueError('CrossRef result missing doi')
-		self.data = { 	'source': self.source,
-						'exid': self.exid,
-						'ids' : { 'doi' : self.exid }
-					}
+		self.data['source'] = self.source
+		self.data['exid'] = self.exid
+		self.data['doi'] = self.exid
 		try:
 			self.data['title'] = meta.find('journal_article/titles/title').text
 		except:
 			raise ValueError('CrossRef result missing title')
-
-		self.data['date'] = {}
 		try:
-			self.data['date']['year'] = meta.find('journal_issue/publication_date/year').text
-			self.data['date']['fulldate'] = self.data['date']['year']
+			self.data['year'] = meta.find('journal_issue/publication_date/year').text
+			self.data['date'] = self.data['year']
 		except:
 			pass
-
-		self.data['venue'] = {}
 		try:
 			jrn_meta = meta.find('journal_metadata')
-			self.data['venue']['name'] = jrn_meta.find('full_title').text
-			self.data['venue']['abbrv'] = jrn_meta.find('abbrev_title').text
-			self.data['venue']['issn'] = jrn_meta.find('issn').text
+			self.data['venue_name'] = jrn_meta.find('full_title').text
+			self.data['venue_abbrv'] = jrn_meta.find('abbrev_title').text
+			self.data['venue_issn'] = jrn_meta.find('issn').text
 		except:
 			pass
 		try:
 			issue_meta = meta.find('journal_issue')
-			self.data['venue']['volume'] = issue_meta.find('journal_volume/volume').text
-			self.data['venue']['issue'] = issue_meta.find('issue').text
+			self.data['venue_volume'] = issue_meta.find('journal_volume/volume').text
+			self.data['venue_issue'] = issue_meta.find('issue').text
 		except:
 			pass
-
-		self.data['authors'] = { 'list': [], 'string': ''}
 		try:
 			auth_meta = meta.findall('journal_article/contributors')
+			self.data['authors'] = ''
 			for auth in auth_meta:
 				last = auth.find('person_name/surname').text
 				first = auth.find('person_name/given_name').text
 				full_name = last + ', ' + first
-				self.data['authors']['list'].append( full_name )
-				self.data['authors']['string'] += full_name
+				self.data['authors_list'].append( full_name )
+				self.data['authors'] += full_name
 		except:
 			pass
-
-		self.data['venue']['pages'] = {}
 		try:
 			pages_meta = meta.find('journal_article/pages')
 			start = pages_meta.find('first_page').text
 			end = pages_meta.find('last_page').text
-			self.data['venue']['pages']['start'] = start
-			self.data['venue']['pages']['end'] = end
-			self.data['venue']['pages']['range'] = start + "-" + end
+			self.data['pages'] = start + "-" + end
 		except:
 			pass
 
-	def json(self):
-		return json.dumps(self.data)
+	def prep_display(self):
+		self.display['short']['title'] = self.data['title']
+		if self.data['venue_abbrv']:
+			self.display['short']['venue'] = self.data['venue_abbrv']
+		elif self.data['venue_name']:
+			self.display['short']['venue'] = self.data['venue_name']
+		if self.data['date']:
+			self.display['short']['date'] = self.data['date']
 
+		self.display['details'].append({'title': self.data['title']})
+		if self.data['authors']:
+			self.display['details'].append(
+				{'authors': self.data['authors']}
+			)
+		if self.data['date']:
+			self.display['details'].append(
+				{'date': self.data['date']}
+			)
+		if self.data['venue_abbrv']:
+			self.display['details'].append(
+				{'journal': self.data['venue_abbrv']}
+			)
+		elif self.data['venue_name']:
+			self.display['details'].append(
+				{'journal': self.data['venue_name']}
+			)
+		if self.data['venue_volume']:
+			self.display['details'].append(
+				{'volume': self.data['venue_volume']}
+			)
+		if self.data['venue_issue']:
+			self.display['details'].append(
+				{'issue': self.data['venue_issue']}
+			)
+		if self.data['pages']:
+			self.display['details'].append(
+				{'pages': self.data['pages']}
+			)
+		self.display['details'].append({'ID': self.data['doi']})
+
+##########################
+######## Process #########
+##########################
 
 def request_crossref(doiChunk):
 	crossref_base = 'https://doi.crossref.org/search/doi'

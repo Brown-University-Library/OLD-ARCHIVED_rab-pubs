@@ -1,7 +1,13 @@
 import json
 import requests
 
-class PubMedResult( object ):
+from utils import Lookup
+
+#############################
+####### PubMed Result #######
+#############################
+
+class PubMedResult( Lookup ):
 
 	def __init__(self, meta):
 		self.prep(meta)
@@ -12,42 +18,76 @@ class PubMedResult( object ):
 			self.exid = meta['uid']
 		except:
 			raise ValueError('PubMedResult result missing pmid')
-		self.data = { 	'source': self.source,
-						'exid': self.exid,
-						'ids' : { 'pmid' : self.exid }
-					}
+		self.data['source'] = self.source
+		self.data['exid'] = self.exid
+		self.data['pmid'] = self.exid
 		try:
 			self.data['title'] = meta['title']
 		except:
 			raise ValueError('CrossRef result missing title')
-
-		self.data['date'] = {}
 		try:
-			self.data['date']['fulldate'] = meta['pubdate']
+			self.data['date'] = meta['pubdate']
+			self.data['year'] = meta['pubdate']
 		except:
 			pass
-
-		self.data['venue'] = { 'pages': {} }
 		try:
-			self.data['venue']['name'] = meta['fulljournalname']
-			self.data['venue']['abbrv'] = meta['source']
-			self.data['venue']['issn'] = meta['issn']
-			self.data['venue']['volume'] = meta['volume']
-			self.data['venue']['issue'] = meta['issue']
-			self.data['venue']['pages']['range'] = meta['pages']
+			self.data['venue_name'] = meta['fulljournalname']
+			self.data['venue_abbrv'] = meta['source']
+			self.data['venue_issn'] = meta['issn']
+			self.data['venue_volume'] = meta['volume']
+			self.data['venue_issue'] = meta['issue']
+			self.data['pages'] = meta['pages']
 		except:
 			pass
-
-		self.data['authors'] = { 'list': [], 'string': ''}
 		try:
 			auth_list = [ auth['name'] for auth in meta['authors'] ]
-			self.data['authors']['list'] = auth_list
-			self.data['authors']['string'] = ', '.join(auth_list)
+			self.data['author_list'] = auth_list
+			self.data['authors'] = ', '.join(auth_list)
 		except:
 			pass
+	def prep_display(self):
+		self.display['short']['title'] = self.data['title']
+		if self.data['venue_abbrv']:
+			self.display['short']['venue'] = self.data['venue_abbrv']
+		elif self.data['venue_name']:
+			self.display['short']['venue'] = self.data['venue_name']
+		if self.data['date']:
+			self.display['short']['date'] = self.data['date']
 
-	def json(self):
-		return json.dumps(self.data)
+		self.display['details'].append({'title': self.data['title']})
+		if self.data['authors']:
+			self.display['details'].append(
+				{'authors': self.data['authors']}
+			)
+		if self.data['date']:
+			self.display['details'].append(
+				{'date': self.data['date']}
+			)
+		if self.data['venue_abbrv']:
+			self.display['details'].append(
+				{'journal': self.data['venue_abbrv']}
+			)
+		elif self.data['venue_name']:
+			self.display['details'].append(
+				{'journal': self.data['venue_name']}
+			)
+		if self.data['venue_volume']:
+			self.display['details'].append(
+				{'volume': self.data['venue_volume']}
+			)
+		if self.data['venue_issue']:
+			self.display['details'].append(
+				{'issue': self.data['venue_issue']}
+			)
+		if self.data['pages']:
+			self.display['details'].append(
+				{'pages': self.data['pages']}
+			)
+		self.display['details'].append({'ID': self.data['pmid']})
+
+##########################
+######## Process #########
+##########################
 
 def get_details(pmidList):
 	esumm_base = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi'

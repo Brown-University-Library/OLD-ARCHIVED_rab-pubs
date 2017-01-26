@@ -74,17 +74,17 @@ harvest.pending = (function() {
 
     loadPending = function (source) {
       var sourceData,
-        $lis, $ul, $target;
+        $lis, $list, $target;
 
         sourceData = configMap.pending_model.all( {'source' : source} );
         $lis = makePendingList( sourceData );
-        $ol = $('<ol/>', {'class' : 'list-group'});
+        $list = $('<ol/>', {'class' : 'list-group'});
         $lis.forEach( function($li) {
-          $ol.append($li);
+          $list.append($li);
         });
 
         $target = jqueryMap.sources[ source ];
-        $target.append($ol);     
+        $target.append($list);     
     };
 
     onClickPendingDetailsModal = function ( exid ) {

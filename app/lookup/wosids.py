@@ -1,11 +1,12 @@
 import json
 import zeep
-from utils import Lookup
+from utils import WosResult
 
-class WosResult( object ):
+###########################
+## Web of Science result ##
+###########################
 
-	def __init__(self, meta):
-		self.prep(meta)
+class WosResult( Lookup ):
 
 	def prep(self, meta):
 		self.source = 'wos'
@@ -13,10 +14,9 @@ class WosResult( object ):
 			self.exid = meta['uid']
 		except:
 			raise ValueError('WOS result missing uid')
-		self.data = { 	'source': self.source,
-						'exid': self.exid,
-						'ids' : { 'wos' : self.exid }
-					}
+		self.data['source'] = self.source
+		self.data['exid'] = self.exid
+		self.data['wosid'] = self.exid
 		try:
 			self.data['title'] = meta['title'][0]['value'][0]
 		except:
@@ -25,52 +25,85 @@ class WosResult( object ):
 			resp_srcs = meta['source']
 		except:
 			raise ValueError('WOS result missing source')
-		self.data['venue'] = { 'pages' : {} }
-		self.data['date'] = { 'fulldate' : 'None'}
 		for src in resp_srcs:
 			if src['label'] == 'SourceTitle' and len(src['value']) != 0:
-				self.data['venue']['name'] = src['value'][0]
-				self.data['venue']['abbrv'] = src['value'][0]
+				self.data['venue_name'] = src['value'][0]
 			if src['label'] == 'Issue' and len(src['value']) != 0:
-				self.data['venue']['issue'] = src['value'][0]
+				self.data['venue_issue'] = src['value'][0]
 			if src['label'] == 'Volume' and len(src['value']) != 0:
-				self.data['venue']['volume'] = src['value'][0]
+				self.data['venue_volume'] = src['value'][0]
 			if src['label'] == 'Pages' and len(src['value']) != 0:
-				self.data['venue']['pages']['range'] = src['value'][0]
+				self.data['pages'] = src['value'][0]
 			if src['label'] == 'Published.BiblioDate' and len(src['value']) != 0:
-				self.data['date']['detail'] = src['value'][0]
+				self.data['date'] = src['value'][0]
 			if src['label'] == 'Published.BiblioYear' and len(src['value']) != 0:
-				self.data['date']['year'] = src['value'][0]
-				self.data['date']['fulldate'] = src['value'][0]
-		detail = self.data['date'].get('detail', None)
-		year = self.data['date'].get('year', None)
-		if detail and year:
-			self.data['date']['fulldate'] = detail + ' ' + year
-
-		self.data['authors'] = {}
+				self.data['year'] = src['value'][0]
 		try:
 			authors = meta['authors'][0]['value']
-			self.data['authors']['list'] = authors
-			self.data['authors']['string'] = ', '.join(authors)
+			self.data['author_list'] = authors
+			self.data['authors'] = ', '.join(authors)
 		except:
 			pass
-
-		self.data['keywords'] = {}
 		try:
 			keywords = meta['keywords'][0]['value']
-			self.data['keywords']['list'] = keywords
-			self.data['keywords']['string'] = ', '.join(keywords)
+			self.data['keyword_list'] = keywords
+			self.data['keywords'] = ', '.join(keywords)
 		except:
 			pass
 
 		for other in meta['other']:
 			if src['label'] == 'Identifier.Doi' and len(other['value']) != 0:
-				self.data['ids']['doi'] = other['value'][0]
+				self.data['doi'] = other['value'][0]
 			if src['label'] == 'Identifier.Issn' and len(other['value']) != 0:
-				self.data['venue']['issn'] = other['value'][0]
+				self.data['venue_issn'] = other['value'][0]
 
-	def json(self):
-		return json.dumps(self.data)
+	def prep_display(self):
+		self.display['short']['title'] = self.data['title']
+		if self.data['venue_name']:
+			self.display['short']['venue'] = self.data['venue_name']
+		if self.data['year']:
+			self.display['short']['date'] = self.data['year']
+		elif self.data['date']:
+			self.display['short']['date'] = self.data['date']
+
+		self.display['details'].append({'title': self.data['title']})
+		if self.data['authors']:
+			self.display['details'].append(
+				{'authors': self.data['authors']}
+			)
+		if self.data['date']:
+			self.display['details'].append(
+				{'date': self.data['date']}
+			)
+		elif self.data['year']:
+			self.display['details'].append(
+				{'date': self.data['year']}
+			)
+		if self.data['venue_name']:
+			self.display['details'].append(
+				{'journal': self.data['venue_name']}
+			)
+		if self.data['venue_volume']:
+			self.display['details'].append(
+				{'volume': self.data['venue_volume']}
+			)
+		if self.data['venue_issue']:
+			self.display['details'].append(
+				{'issue': self.data['venue_issue']}
+			)
+		if self.data['pages']:
+			self.display['details'].append(
+				{'pages': self.data['pages']}
+			)
+		if self.data['keywords']:
+			self.display['details'].append(
+				{'keywords': self.data['keywords']}
+			)
+		self.display['details'].append({'ID': self.data['wosid']})
+
+##########################
+######## Process #########
+##########################
 
 def get_details(wosidList, sid):
 	### !!!!Need to handle MEDLINE: ids
