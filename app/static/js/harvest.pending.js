@@ -21,7 +21,7 @@ harvest.pending = (function() {
         jqueryMap = {
           'sources' : {},
           $modal : $('#modalDetails'),
-          $table : $('#detailsTable'),
+          $table : $('#detailsTableBody'),
         };
 
       $.each($sources, function( i, source ) {
@@ -37,7 +37,8 @@ harvest.pending = (function() {
 
       jsonList.forEach( function( pendingObj ) {
         var pendingObj,
-            $li, $title, $venue, $date, $modal_btn;
+            $li, $title, $venue, $date,
+            $modal_btn, $col1, $col2;
 
         $li = $('<li/>', {  'class'       : 'list-group-item',
                             'data-source' : pendingObj.source,
@@ -50,10 +51,14 @@ harvest.pending = (function() {
         $date = $('<span/>', {  'class' : 'pending-date',
                                 'text'  : pendingObj.display.short.date });
         $modal_btn = $('<button/>', { 'type'        : 'button',
-                                      'class'       : 'btn btn-primary details-modal',
-                                      'data-exid'   : pendingObj.exid
+                                      'class'       : 'btn btn-primary details-modal-btn',
+                                      'data-exid'   : pendingObj.exid,
+                                      'html'        : '<span class="glyphicon glyphicon-plus"></span>'
                                     });
 
+        $col1 = $('<span/>', { 'class' : 'pending-list-col col1' });
+        $col2 = $('<span/>', { 'class' : 'pending-list-col' });
+        
         $modal_btn.on('click', function(e) {
           e.preventDefault();
 
@@ -61,10 +66,13 @@ harvest.pending = (function() {
           onClickPendingDetailsModal( exid );
         });
 
-        $li.append($title);
-        $li.append($venue);
-        $li.append($date);
-        $li.append($modal_btn);
+        $col1.append($title);
+        $col1.append($venue);
+        $col1.append($date);
+        $col2.append($modal_btn);
+
+        $li.append($col1);
+        $li.append($col2);
 
         list_items.push( $li );
       });
@@ -99,8 +107,9 @@ harvest.pending = (function() {
       pendingObj = configMap.pending_model.get( {'exid' : exid.toString() });
       pendingObj.display.details.forEach( function( detailsObj ) {
           $tr = $('<tr/>');
-          $key = $('<td/>', {'text' : detailsObj.key });
-          $value = $('<td/>', {'text' : detailsObj.value });
+          $key = $('<th/>', { 'scope': 'row',
+                              'text' : detailsObj.key });
+          $value = $('<td/>', { 'text' : detailsObj.value });
 
           $tr.append($key);
           $tr.append($value);

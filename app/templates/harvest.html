@@ -7,6 +7,7 @@
     {% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/harvest.pending.css') }}">
     <script src="{{ url_for('static', filename='jquery/jquery-3.1.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery/jquery-ui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
@@ -50,7 +51,9 @@
                 </button>
               </div>
               <div class="modal-body">
-                <table id="detailsTable">
+                <table id="detailsTable" class="table">
+                  <tbody id="detailsTableBody">
+                  </tbody>
                 </table>
               </div>
               <div class="modal-footer">

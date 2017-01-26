@@ -1,0 +1,22 @@
+.pending-list-col {
+	display: inline-block;
+}
+
+.pending-list-col.col1 {
+	width: 60%;
+}
+
+.pending-title {
+	display: block;
+}
+
+.pending-venue {
+	margin-right: 1rem;
+}
+
+.pending-date {
+}
+
+.details-modal-btn {
+	vertical-align: middle;
+}
