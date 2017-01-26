@@ -44,11 +44,11 @@ harvest.pending = (function() {
                             'data-exid'   : pendingObj.exid,
                           });
         $title = $('<span/>', { 'class' : 'pending-title',
-                                'text'  : pendingObj.title });
+                                'text'  : pendingObj.display.short.title });
         $venue = $('<span/>', { 'class' : 'pending-venue',
-                                'text'  : pendingObj.venue.abbrv });
+                                'text'  : pendingObj.display.short.venue });
         $date = $('<span/>', {  'class' : 'pending-date',
-                                'text'  : pendingObj.date.fulldate });
+                                'text'  : pendingObj.display.short.date });
         $modal_btn = $('<button/>', { 'type'        : 'button',
                                       'class'       : 'btn btn-primary details-modal',
                                       'data-exid'   : pendingObj.exid
@@ -88,24 +88,24 @@ harvest.pending = (function() {
     };
 
     onClickPendingDetailsModal = function ( exid ) {
-      var $modal, $table, details;
+      var
+        $modal, $table,
+        pendingObj;
       
       $modal = jqueryMap.$modal;
       $table = jqueryMap.$table;
       $table.empty();
 
-      details = configMap.pending_model.get( {'exid' : exid.toString() });
-      for (var key in details) {
-        if (details.hasOwnProperty(key)) {
+      pendingObj = configMap.pending_model.get( {'exid' : exid.toString() });
+      pendingObj.display.details.forEach( function( detailsObj ) {
           $tr = $('<tr/>');
-          $key = $('<td/>', {'text' : key });
-          $value = $('<td/>', {'text' : details[key]});
+          $key = $('<td/>', {'text' : detailsObj.key });
+          $value = $('<td/>', {'text' : detailsObj.value });
 
           $tr.append($key);
           $tr.append($value);
           $table.append($tr);
-        }
-      }
+      });
       $modal.modal('show');
     };
 

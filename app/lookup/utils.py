@@ -46,3 +46,14 @@ class Lookup(object):
 
 	def prep_display(self):
 		pass
+
+	def json(self):
+		return {
+			'exid' : self.exid,
+			'source' : self.source,
+			'display' : self.display,
+			'meta': self.data
+		}
+
+	def metadatum(self, key, value):
+		return { 'key' : key, 'value': value }

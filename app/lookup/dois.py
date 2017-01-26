@@ -10,7 +10,7 @@ from utils import Lookup
 
 class CrossRefResult( Lookup ):
 
-	def prep(self, meta):
+	def prep_meta(self, meta):
 		self.source = 'crossref'
 		try:
 			doi = meta.find('journal_article/doi_data/doi').text
@@ -21,11 +21,13 @@ class CrossRefResult( Lookup ):
 		self.data['exid'] = self.exid
 		self.data['doi'] = self.exid
 		try:
-			self.data['title'] = meta.find('journal_article/titles/title').text
+			self.data['title'] = meta.find(
+				'journal_article/titles/title').text
 		except:
 			raise ValueError('CrossRef result missing title')
 		try:
-			self.data['year'] = meta.find('journal_issue/publication_date/year').text
+			self.data['year'] = meta.find(
+				'journal_issue/publication_date/year').text
 			self.data['date'] = self.data['year']
 		except:
 			pass
@@ -38,19 +40,20 @@ class CrossRefResult( Lookup ):
 			pass
 		try:
 			issue_meta = meta.find('journal_issue')
-			self.data['venue_volume'] = issue_meta.find('journal_volume/volume').text
+			self.data['venue_volume'] = issue_meta.find(
+								'journal_volume/volume').text
 			self.data['venue_issue'] = issue_meta.find('issue').text
 		except:
 			pass
 		try:
-			auth_meta = meta.findall('journal_article/contributors')
-			self.data['authors'] = ''
+			auth_meta = meta.findall(
+				'journal_article/contributors/person_name')
 			for auth in auth_meta:
-				last = auth.find('person_name/surname').text
-				first = auth.find('person_name/given_name').text
+				last = auth.find('surname').text
+				first = auth.find('given_name').text
 				full_name = last + ', ' + first
-				self.data['authors_list'].append( full_name )
-				self.data['authors'] += full_name
+				self.data['author_list'].append( full_name )
+			self.data['authors'] = '; '.join(self.data['author_list'])
 		except:
 			pass
 		try:
@@ -70,36 +73,40 @@ class CrossRefResult( Lookup ):
 		if self.data['date']:
 			self.display['short']['date'] = self.data['date']
 
-		self.display['details'].append({'title': self.data['title']})
+		self.display['details'].append(
+			self.metadatum('title', self.data['title'])
+			)
 		if self.data['authors']:
 			self.display['details'].append(
-				{'authors': self.data['authors']}
+				self.metadatum('authors', self.data['authors'])
 			)
 		if self.data['date']:
 			self.display['details'].append(
-				{'date': self.data['date']}
+				self.metadatum('date', self.data['date'])
 			)
 		if self.data['venue_abbrv']:
 			self.display['details'].append(
-				{'journal': self.data['venue_abbrv']}
+				self.metadatum('journal', self.data['venue_abbrv'])
 			)
 		elif self.data['venue_name']:
 			self.display['details'].append(
-				{'journal': self.data['venue_name']}
+				self.metadatum('journal', self.data['venue_name'])
 			)
 		if self.data['venue_volume']:
 			self.display['details'].append(
-				{'volume': self.data['venue_volume']}
+				self.metadatum('volume', self.data['venue_volume'])
 			)
 		if self.data['venue_issue']:
 			self.display['details'].append(
-				{'issue': self.data['venue_issue']}
+				self.metadatum('issue', self.data['venue_issue'])
 			)
 		if self.data['pages']:
 			self.display['details'].append(
-				{'pages': self.data['pages']}
+				self.metadatum('pages', self.data['pages'])
 			)
-		self.display['details'].append({'ID': self.data['doi']})
+		self.display['details'].append(
+			self.metadatum('ID', self.data['doi'])
+			)
 
 ##########################
 ######## Process #########

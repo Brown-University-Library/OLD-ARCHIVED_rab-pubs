@@ -1,7 +1,6 @@
 import datetime
-import json
 
-from flask import render_template
+from flask import render_template, jsonify
 from app import app
 from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
 
@@ -37,8 +36,7 @@ def get_pending_academic_analytics(short_id):
 				source_rabid=src_rabid,
 				status='p').all()
 	lookups = dois.get_details([ exid.exid for exid in exids])
-	display = [ lookup.json() for lookup in lookups ]
-	return json.dumps(display)
+	return jsonify([ lookup.json() for lookup in lookups ])
 
 @app.route('/rabpubs/<short_id>/pending/pubmed')
 def get_pending_pubmed(short_id):
@@ -49,8 +47,7 @@ def get_pending_pubmed(short_id):
 				source_rabid=src_rabid,
 				status='p').all()
 	lookups = pmids.get_details([ exid.exid for exid in exids ])
-	display = [ lookup.json() for lookup in lookups ]
-	return json.dumps(display)
+	return jsonify([ lookup.json() for lookup in lookups ])
 
 @app.route('/rabpubs/<short_id>/pending/wos')
 def get_pending_wos(short_id):
@@ -62,5 +59,4 @@ def get_pending_wos(short_id):
 				status='p').all()
 	sid = wos_session.get_sid()
 	lookups = wosids.get_details([ exid.exid for exid in exids ], sid)
-	display = [ lookup.json() for lookup in lookups ]
-	return json.dumps(display)
+	return jsonify([ lookup.json() for lookup in lookups ])

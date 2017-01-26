@@ -1,6 +1,6 @@
 import json
 import zeep
-from utils import WosResult
+from utils import Lookup
 
 ###########################
 ## Web of Science result ##
@@ -8,7 +8,7 @@ from utils import WosResult
 
 class WosResult( Lookup ):
 
-	def prep(self, meta):
+	def prep_meta(self, meta):
 		self.source = 'wos'
 		try:
 			self.exid = meta['uid']
@@ -41,7 +41,7 @@ class WosResult( Lookup ):
 		try:
 			authors = meta['authors'][0]['value']
 			self.data['author_list'] = authors
-			self.data['authors'] = ', '.join(authors)
+			self.data['authors'] = '; '.join(authors)
 		except:
 			pass
 		try:
@@ -66,40 +66,43 @@ class WosResult( Lookup ):
 		elif self.data['date']:
 			self.display['short']['date'] = self.data['date']
 
-		self.display['details'].append({'title': self.data['title']})
+		self.display['details'].append(
+			self.metadatum('title', self.data['title'])
+			)
 		if self.data['authors']:
 			self.display['details'].append(
-				{'authors': self.data['authors']}
+				self.metadatum('authors', self.data['authors'])
 			)
 		if self.data['date']:
 			self.display['details'].append(
-				{'date': self.data['date']}
+				self.metadatum('date', self.data['date'])
 			)
 		elif self.data['year']:
 			self.display['details'].append(
-				{'date': self.data['year']}
+				self.metadatum('date', self.data['year'])
 			)
 		if self.data['venue_name']:
 			self.display['details'].append(
-				{'journal': self.data['venue_name']}
+				self.metadatum('journal', self.data['venue_name'])
 			)
 		if self.data['venue_volume']:
 			self.display['details'].append(
-				{'volume': self.data['venue_volume']}
+				self.metadatum('volume', self.data['venue_volume'])
 			)
 		if self.data['venue_issue']:
 			self.display['details'].append(
-				{'issue': self.data['venue_issue']}
-			)
+				self.metadatum('issue', self.data['venue_issue'])			)
 		if self.data['pages']:
 			self.display['details'].append(
-				{'pages': self.data['pages']}
+				self.metadatum('pages', self.data['pages'])
 			)
 		if self.data['keywords']:
 			self.display['details'].append(
-				{'keywords': self.data['keywords']}
+				self.metadatum('keywords', self.data['keywords'])
 			)
-		self.display['details'].append({'ID': self.data['wosid']})
+		self.display['details'].append(
+			self.metadatum('ID', self.data['wosid'])
+			)
 
 ##########################
 ######## Process #########

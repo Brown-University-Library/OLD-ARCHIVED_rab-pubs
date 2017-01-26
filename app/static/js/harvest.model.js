@@ -12,8 +12,7 @@ harvest.model = (function () {
 	pending_db = TAFFY();
 
 	update = function ( data, source ) {
-		data.forEach( function ( pendingStr ) {
-			pendingObj = JSON.parse(pendingStr);
+		data.forEach( function ( pendingObj ) {
 			pendingObj.source = source;
 			pending_db.insert( pendingObj );
 		})

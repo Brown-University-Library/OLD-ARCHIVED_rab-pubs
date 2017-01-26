@@ -9,10 +9,7 @@ from utils import Lookup
 
 class PubMedResult( Lookup ):
 
-	def __init__(self, meta):
-		self.prep(meta)
-
-	def prep(self, meta):
+	def prep_meta(self, meta):
 		self.source = 'pubmed'
 		try:
 			self.exid = meta['uid']
@@ -54,36 +51,40 @@ class PubMedResult( Lookup ):
 		if self.data['date']:
 			self.display['short']['date'] = self.data['date']
 
-		self.display['details'].append({'title': self.data['title']})
+		self.display['details'].append(
+			self.metadatum('title', self.data['title'])
+			)
 		if self.data['authors']:
 			self.display['details'].append(
-				{'authors': self.data['authors']}
+				self.metadatum('authors', self.data['authors'])
 			)
 		if self.data['date']:
 			self.display['details'].append(
-				{'date': self.data['date']}
+				self.metadatum('date', self.data['date'])
 			)
 		if self.data['venue_abbrv']:
 			self.display['details'].append(
-				{'journal': self.data['venue_abbrv']}
+				self.metadatum('journal', self.data['venue_abbrv'])
 			)
 		elif self.data['venue_name']:
 			self.display['details'].append(
-				{'journal': self.data['venue_name']}
+				self.metadatum('journal', self.data['venue_name'])
 			)
 		if self.data['venue_volume']:
 			self.display['details'].append(
-				{'volume': self.data['venue_volume']}
+				self.metadatum('volume', self.data['venue_volume'])
 			)
 		if self.data['venue_issue']:
 			self.display['details'].append(
-				{'issue': self.data['venue_issue']}
+				self.metadatum('issue', self.data['venue_issue'])
 			)
 		if self.data['pages']:
 			self.display['details'].append(
-				{'pages': self.data['pages']}
+				self.metadatum('pages', self.data['pages'])
 			)
-		self.display['details'].append({'ID': self.data['pmid']})
+		self.display['details'].append(
+			self.metadatum('ID', self.data['pmid'])
+			)
 
 ##########################
 ######## Process #########
