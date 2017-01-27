@@ -1,9 +1,15 @@
-.pending-list-col {
-	display: inline-block;
+.pending-list-item {
+	display: flex;
+    flex-direction: row;
 }
 
-.pending-list-col.col1 {
-	width: 60%;
+.pending-list-col {
+	flex: 1 1 auto;
+}
+
+.pending-list-col:first-child {
+	width: 10%;
+	padding: 0 10% 0 5%;
 }
 
 .pending-title {
@@ -15,8 +21,4 @@
 }
 
 .pending-date {
-}
-
-.details-modal-btn {
-	vertical-align: middle;
 }

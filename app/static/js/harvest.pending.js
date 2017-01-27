@@ -40,11 +40,11 @@ harvest.pending = (function() {
             $li, $title, $venue, $date,
             $modal_btn, $col1, $col2;
 
-        $li = $('<li/>', {  'class'       : 'list-group-item',
+        $li = $('<li/>', {  'class'       : 'list-group-item pending-list-item',
                             'data-source' : pendingObj.source,
                             'data-exid'   : pendingObj.exid,
                           });
-        $title = $('<span/>', { 'class' : 'pending-title',
+        $title = $('<h5/>', { 'class' : 'pending-title',
                                 'text'  : pendingObj.display.short.title });
         $venue = $('<span/>', { 'class' : 'pending-venue',
                                 'text'  : pendingObj.display.short.venue });
@@ -56,7 +56,7 @@ harvest.pending = (function() {
                                       'html'        : '<span class="glyphicon glyphicon-plus"></span>'
                                     });
 
-        $col1 = $('<span/>', { 'class' : 'pending-list-col col1' });
+        $col1 = $('<span/>', { 'class' : 'pending-list-col' });
         $col2 = $('<span/>', { 'class' : 'pending-list-col' });
         
         $modal_btn.on('click', function(e) {

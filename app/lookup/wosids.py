@@ -63,8 +63,6 @@ class WosResult( Lookup ):
 			self.display['short']['venue'] = self.data['venue_name']
 		if self.data['year']:
 			self.display['short']['date'] = self.data['year']
-		elif self.data['date']:
-			self.display['short']['date'] = self.data['date']
 
 		self.display['details'].append(
 			self.metadatum('title', self.data['title'])
@@ -73,13 +71,13 @@ class WosResult( Lookup ):
 			self.display['details'].append(
 				self.metadatum('authors', self.data['authors'])
 			)
+		if self.data['year']:
+			self.display['details'].append(
+				self.metadatum('year', self.data['year'])
+			)
 		if self.data['date']:
 			self.display['details'].append(
 				self.metadatum('date', self.data['date'])
-			)
-		elif self.data['year']:
-			self.display['details'].append(
-				self.metadatum('date', self.data['year'])
 			)
 		if self.data['venue_name']:
 			self.display['details'].append(
