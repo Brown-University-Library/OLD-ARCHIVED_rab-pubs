@@ -7,7 +7,8 @@ harvest.shell = (function () {
     },
 		
     jqueryMap = {},
-
+    onPendingQueryCompleted,
+    onQueriesQueryCompleted,
 		setJqueryMap, initModule;
 	//----------------- END MODULE SCOPE VARIABLES ---------------
   //------------------- BEGIN UTILITY METHODS ------------------
@@ -28,6 +29,10 @@ harvest.shell = (function () {
     harvest.pending.loadPending( source );
   };
 
+  onQueriesQueryCompleted = function ( source ) {
+    harvest.queries.loadQueries( source );
+  };
+
   //----------------------- END CALLBACKS ----------------------
   //------------------- BEGIN PUBLIC METHODS -------------------
   // Begin Public method /initModule/
@@ -43,16 +48,18 @@ harvest.shell = (function () {
     });
     harvest.pending.initModule( jqueryMap.$container );
 
-    // harvest.queries.configModule({
-    //   queries_model : harvest.model.queries
-    // });
-    // harvest.queries.initModule( jqueryMap.$container );
+    harvest.queries.configModule({
+      queries_model : harvest.model.queries
+    });
+    harvest.queries.initModule( jqueryMap.$container );
 
     $( window ).on( 'pendingQueryCompleted', function( e, source ) {
       onPendingQueryCompleted( source );
     });
 
-    $( window ).on( 'queryModelInitialized' )
+    // $( window ).on( 'queriesQueryCompleted', function( e, source) {
+    //   onQueriesQueryCompleted( source );
+    // });
 
   };
   return { initModule : initModule };

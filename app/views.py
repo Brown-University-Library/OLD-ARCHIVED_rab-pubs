@@ -11,9 +11,6 @@ from app.utils import wos, namespaces
 wos_session = wos.Session()
 wos_session.authenticate()
 
-harvest_params = {
-	'rabid:1b404f6f24b449688bed96f0b2587d4d'	: pubmed.params
-}
 
 @app.route('/rabpubs/<short_id>/pending')
 def pending(short_id):
@@ -55,15 +52,20 @@ def lookup_pending(short_id, source_id):
 		raise ValueError("Unrecognized source")
 	return jsonify([ lookup.json() for lookup in lookups ])
 
-@app.route('/rabpubs/<short_id>/harvest/<source>', methods=['GET'])
+@app.route('/rabpubs/<short_id>/queries/<source>', methods=['GET'])
 def list_harvest_processes(short_id, source):
+	harvest_params = {
+		'http://vivo.brown.edu/individual/70209659b6af4980b17ef39884160406': ['shoe'],
+		'http://vivo.brown.edu/individual/c53746b63fe848bbac0a1ac0bf559b27': ['foo'],
+		'http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d'	: pubmed.params
+	}
 	src_rabid = namespaces.rabid(source)
-	params = harvest_params[source]
+	params = harvest_params[src_rabid]
 	user = Users.query.filter_by(short_id=short_id).first()
 	procs = HarvestProcesses.query.filter_by(
 				user_rabid=user.rabid, source_rabid=src_rabid).all()
-	queries = [ proc.process_data for proc in procs ]
-	return jsonify({ 'new': params, 'existing': queries })
+	queries = [ {'display': proc.process_data} for proc in procs ]
+	return jsonify({ 'params': params, 'queries': queries })
 
 @app.route('/rabpubs/<short_id>/harvest/', methods=['POST'])
 def create_harvest_process(short_id):

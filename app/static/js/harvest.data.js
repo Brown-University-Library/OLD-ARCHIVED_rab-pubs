@@ -26,12 +26,24 @@ harvest.data = (function () {
     });
   };
 
+  getQueries = function( source ) {
+    $.ajax({
+      dataType: "json",
+      crossDomain: true,
+      url: 'http://localhost:8000/rabpubs/' + configMap.shortid + '/queries/' + source,
+      success: function( data ) {
+        harvest.model.update_queries( data, source );
+      }
+    });
+  };
+
 	initModule = function ( shortid ){
     configMap.shortid = shortid;
   };
 
 	return {
     getPending : getPending,
+    getQueries : getQueries,
     configModule : configModule,
 		initModule : initModule
 	};

@@ -12,7 +12,8 @@ harvest.queries = (function() {
       loadQueries, makeQueriesList,
 
       onClickQueryDetailsModal,
-      onClickNewQueryModal, on
+      onClickNewQueryModal,
+      initializeModel,
       setJqueryMap, initModule;
 
 
@@ -71,8 +72,8 @@ harvest.queries = (function() {
       var sourceData,
         $lis, $list, $target;
 
-        sourceData = configMap.pending_model.all( {'source' : source} );
-        $lis = makePendingList( sourceData );
+        sourceData = configMap.queries_model.all( {'source' : source} );
+        $lis = makeQueriesList( sourceData );
         $list = $('<ol/>', {'class' : 'list-group'});
         $lis.forEach( function($li) {
           $list.append($li);
@@ -114,11 +115,11 @@ harvest.queries = (function() {
       $table = jqueryMap.$table;
       $table.empty();
 
-      queryObj = configMap.query_model.get( {'source' : source.toString(), 'new': true });
-      queryObj.parameters.forEach( function( paramObj ) {
+      queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
+      queryObj.params.forEach( function( param ) {
           $tr = $('<tr/>');
           $key = $('<th/>', { 'scope': 'row',
-                              'text' : paramObj.key });
+                              'text' : param });
           $value = $('<td/>', { 'text' : '' });
 
           $tr.append($key);
@@ -128,14 +129,20 @@ harvest.queries = (function() {
       $modal.modal('show');
     };
 
+    initializeModel = function () {
+      for (var rabid in jqueryMap.sources) {
+          configMap.queries_model.initialize( rabid );
+      }
+    };
+
     configModule = function ( map ) {
-      configMap.query_model = map.query_model;
+      configMap.queries_model = map.queries_model;
     };
 
     initModule = function () {
       setJqueryMap();
 
-      configMap.query_model.initialize();
+      initializeModel();
 
       $('.new-query-modal-btn').on('click', function(e){
         e.preventDefault();
