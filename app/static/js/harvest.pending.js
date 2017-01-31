@@ -26,7 +26,7 @@ harvest.pending = (function() {
 
       $.each($sources, function( i, source ) {
         var rabid = $( this ).data('rabid');
-        var $panel = $( this ).find('.panel-collapse');
+        var $panel = $( this ).find('.pending-collapse');
 
         jqueryMap.sources[rabid] = $panel;
       });

@@ -1,15 +1,19 @@
 import datetime
 
 from flask import render_template, jsonify
-from app import app
+from app import app, db
 from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
 
+from app.harvest import pubmed
 from app.lookup import dois, pmids, wosids
-from app.utils import wos
+from app.utils import wos, namespaces
 
 wos_session = wos.Session()
 wos_session.authenticate()
 
+harvest_params = {
+	'rabid:1b404f6f24b449688bed96f0b2587d4d'	: pubmed.params
+}
 
 @app.route('/rabpubs/<short_id>/pending')
 def pending(short_id):
@@ -19,7 +23,7 @@ def pending(short_id):
 	exids_by_source = { source.rabid: []  for source in sources }
 	for exid in exids:
 		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
-	exid_counts_by_source = { source.rabid[33:]: {
+	exid_counts_by_source = { namespaces.rabid(source.rabid): {
 								'name': source.name,
 								'count': len(exids_by_source[source.rabid])
 								} for source in sources }
@@ -60,3 +64,47 @@ def get_pending_wos(short_id):
 	sid = wos_session.get_sid()
 	lookups = wosids.get_details([ exid.exid for exid in exids ], sid)
 	return jsonify([ lookup.json() for lookup in lookups ])
+
+@app.route('/rabpubs/<short_id>/harvest/<source>', methods=['GET'])
+def list_harvest_processes(short_id, source):
+	src_rabid = namespaces.rabid(source)
+	params = harvest_params[source]
+	user = Users.query.filter_by(short_id=short_id).first()
+	procs = HarvestProcesses.query.filter_by(
+				user_rabid=user.rabid, source_rabid=src_rabid).all()
+	queries = [ proc.process_data for proc in procs ]
+	return jsonify({ 'new': params, 'existing': queries })
+
+@app.route('/rabpubs/<short_id>/harvest/', methods=['POST'])
+def create_harvest_process(short_id):
+	user = Users.query.filter_by(short_id=short_id).first()
+	data = request.get_json()
+	new_proc = HarvestProcesses(
+				user_rabid=user.rabid,
+				source_rabid="http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d",
+				status="a",
+				process_data=json.dumps(data)
+				)
+	db.session.add(new_proc)
+	db.session.commit()
+	return jsonify({'id': new_proc.id})
+
+@app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['GET'])
+def get_harvest_process(short_id, proc_id):
+	rabid = namespaces.rabid(proc_id)
+	user = Users.query.filter_by(short_id=short_id).first()
+	proc = HarvestProcesses.query.filter_by(rabid=rabid).first()
+
+@app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['PUT'])
+def update_harvest_process(short_id, proc_id):
+	pass
+
+@app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['DELETE'])
+def delete_harvest_process(short_id, proc_id):
+	pass
+
+@app.route('/rabpubs/<short_id>/harvest/<proc_id>/pubmed')
+def run_pubmed_harvest(short_id, proc_id):
+	rabid = namespaces.rabid(proc_id)
+	user = Users.query.filter_by(short_id=short_id).first()
+	proc = HarvestProcesses.query.filter_by(rabid=rabid).first()

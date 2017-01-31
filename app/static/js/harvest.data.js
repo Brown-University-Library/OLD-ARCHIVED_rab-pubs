@@ -15,7 +15,7 @@ harvest.data = (function () {
 	initModule = function ( shortid ){
 
           (function() {
-            var target = '#1b404f6f24b449688bed96f0b2587d4d-pending-collapse';
+            var target = '#rabid-1b404f6f24b449688bed96f0b2587d4d-pending-collapse';
             var count = $(target).data('pending-count');
             if (count > 0) {
               $.ajax({
@@ -23,7 +23,7 @@ harvest.data = (function () {
                 crossDomain: true,
                 url: 'http://localhost:8000/rabpubs/' + shortid + '/pending/pubmed',
                 success: function( data ) {
-                  var source = '1b404f6f24b449688bed96f0b2587d4d';
+                  var source = 'rabid-1b404f6f24b449688bed96f0b2587d4d';
                   harvest.model.update( data, source );
                   $( window ).trigger( 'pendingQueryCompleted', source );
                 }
@@ -32,7 +32,7 @@ harvest.data = (function () {
           })();
 
           (function() {
-            var target = '#70209659b6af4980b17ef39884160406-pending-collapse';
+            var target = '#rabid-70209659b6af4980b17ef39884160406-pending-collapse';
             var count = $(target).data('pending-count');
             if (count > 0) {
               $.ajax({
@@ -40,7 +40,7 @@ harvest.data = (function () {
                 crossDomain: true,
                 url: 'http://localhost:8000/rabpubs/' + shortid + '/pending/wos',
                 success:  function( data ) {
-                  var source = '70209659b6af4980b17ef39884160406';
+                  var source = 'rabid-70209659b6af4980b17ef39884160406';
                   harvest.model.update( data, source );
                   $( window ).trigger( 'pendingQueryCompleted', source );
                 }
@@ -49,7 +49,7 @@ harvest.data = (function () {
           })();
 
           (function() {
-            var target = '#c53746b63fe848bbac0a1ac0bf559b27-pending-collapse';
+            var target = '#rabid-c53746b63fe848bbac0a1ac0bf559b27-pending-collapse';
             var count = $(target).data('pending-count');
             if (count > 0) {
               $.ajax({
@@ -57,7 +57,7 @@ harvest.data = (function () {
                 crossDomain: true,
                 url: 'http://localhost:8000/rabpubs/' + shortid + '/pending/academic_analytics',
                 success: function( data ) {
-                  var source = 'c53746b63fe848bbac0a1ac0bf559b27'
+                  var source = 'rabid-c53746b63fe848bbac0a1ac0bf559b27'
                   harvest.model.update( data, source );
                   $( window ).trigger( 'pendingQueryCompleted', source );
                 }
