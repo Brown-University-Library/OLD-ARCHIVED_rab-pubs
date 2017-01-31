@@ -11,16 +11,17 @@ harvest.model = (function () {
 
 	pending_db = TAFFY();
 
-	update = function ( data, source ) {
+	update_pending = function ( data, source ) {
 		data.forEach( function ( pendingObj ) {
 			pendingObj.source = source;
 			pending_db.insert( pendingObj );
 		})
+		$( window ).trigger( 'pendingQueryCompleted', source );
 	};
 
 	pending = (function () {
 		var
-			get_pending;
+			get, all, initialize;
 
 		get = function ( paramObj ) {
 			var data;
@@ -36,9 +37,14 @@ harvest.model = (function () {
 			return data;
 		}
 
+		initialize = function ( sourceRabid ) {
+			harvest.data.getPending( sourceRabid );
+		}
+
 		return {
 			get : get,
-			all : all
+			all : all,
+			initialize : initialize
 		}
 	}());
 
@@ -47,6 +53,6 @@ harvest.model = (function () {
 	return {
 		initModule : initModule,
 		pending : pending,
-		update : update
+		update_pending : update_pending
 	};
 }());

@@ -12,6 +12,7 @@ harvest.pending = (function() {
       loadPending, makePendingList,
 
       onClickPendingDetailsModal,
+      initializeModel,
       setJqueryMap, initModule;
 
 
@@ -95,6 +96,16 @@ harvest.pending = (function() {
         $target.append($list);     
     };
 
+    initializeModel = function () {
+      for (var rabid in jqueryMap.sources) {
+        $panel = jqueryMap.sources[rabid];
+        var count = $panel.data('pending-count');
+        if (count > 0) {
+          configMap.pending_model.initialize( rabid );
+        }
+      }
+    };
+
     onClickPendingDetailsModal = function ( exid ) {
       var
         $modal, $table,
@@ -124,6 +135,8 @@ harvest.pending = (function() {
 
     initModule = function () {
       setJqueryMap();
+
+      initializeModel();
     };
 
     return {

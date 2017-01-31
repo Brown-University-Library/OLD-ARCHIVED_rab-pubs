@@ -11,7 +11,8 @@ harvest.queries = (function() {
 
       loadQueries, makeQueriesList,
 
-      onClickQueriesDetailsModal,
+      onClickQueryDetailsModal,
+      onClickNewQueryModal, on
       setJqueryMap, initModule;
 
 
@@ -104,12 +105,44 @@ harvest.queries = (function() {
       $modal.modal('show');
     };
 
+    onClickNewQueryModal = function ( src ) {
+      var
+        $modal, $table,
+        queryObj;
+      
+      $modal = jqueryMap.$modal;
+      $table = jqueryMap.$table;
+      $table.empty();
+
+      queryObj = configMap.query_model.get( {'source' : source.toString(), 'new': true });
+      queryObj.parameters.forEach( function( paramObj ) {
+          $tr = $('<tr/>');
+          $key = $('<th/>', { 'scope': 'row',
+                              'text' : paramObj.key });
+          $value = $('<td/>', { 'text' : '' });
+
+          $tr.append($key);
+          $tr.append($value);
+          $table.append($tr);
+      });
+      $modal.modal('show');
+    };
+
     configModule = function ( map ) {
       configMap.query_model = map.query_model;
     };
 
     initModule = function () {
       setJqueryMap();
+
+      configMap.query_model.initialize();
+
+      $('.new-query-modal-btn').on('click', function(e){
+        e.preventDefault();
+
+        var src = $( this ).data('harvest-source');
+        onClickNewQueryModal( src );
+      });
     };
 
     return {

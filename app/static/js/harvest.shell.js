@@ -43,10 +43,16 @@ harvest.shell = (function () {
     });
     harvest.pending.initModule( jqueryMap.$container );
 
+    // harvest.queries.configModule({
+    //   queries_model : harvest.model.queries
+    // });
+    // harvest.queries.initModule( jqueryMap.$container );
 
     $( window ).on( 'pendingQueryCompleted', function( e, source ) {
       onPendingQueryCompleted( source );
     });
+
+    $( window ).on( 'queryModelInitialized' )
 
   };
   return { initModule : initModule };

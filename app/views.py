@@ -31,38 +31,28 @@ def pending(short_id):
 							user=user,
 							counts=exid_counts_by_source)
 
-@app.route('/rabpubs/<short_id>/pending/academic_analytics')
-def get_pending_academic_analytics(short_id):
-	src_rabid = "http://vivo.brown.edu/individual/c53746b63fe848bbac0a1ac0bf559b27"
+@app.route('/rabpubs/<short_id>/pending/<source_id>')
+def lookup_pending(short_id, source_id):
+	src_names = {
+		'http://vivo.brown.edu/individual/70209659b6af4980b17ef39884160406': 'wos',
+		'http://vivo.brown.edu/individual/c53746b63fe848bbac0a1ac0bf559b27': 'aa',
+		'http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d': 'pubmed'
+	}
+	src_rabid = namespaces.rabid(source_id)
 	user = Users.query.filter_by(short_id=short_id).first()
 	exids = HarvestExids.query.filter_by(
 				user_rabid=user.rabid,
 				source_rabid=src_rabid,
 				status='p').all()
-	lookups = dois.get_details([ exid.exid for exid in exids])
-	return jsonify([ lookup.json() for lookup in lookups ])
-
-@app.route('/rabpubs/<short_id>/pending/pubmed')
-def get_pending_pubmed(short_id):
-	src_rabid = "http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d"
-	user = Users.query.filter_by(short_id=short_id).first()
-	exids = HarvestExids.query.filter_by(
-				user_rabid=user.rabid,
-				source_rabid=src_rabid,
-				status='p').all()
-	lookups = pmids.get_details([ exid.exid for exid in exids ])
-	return jsonify([ lookup.json() for lookup in lookups ])
-
-@app.route('/rabpubs/<short_id>/pending/wos')
-def get_pending_wos(short_id):
-	src_rabid = "http://vivo.brown.edu/individual/70209659b6af4980b17ef39884160406"
-	user = Users.query.filter_by(short_id=short_id).first()
-	exids = HarvestExids.query.filter_by(
-				user_rabid=user.rabid,
-				source_rabid=src_rabid,
-				status='p').all()
-	sid = wos_session.get_sid()
-	lookups = wosids.get_details([ exid.exid for exid in exids ], sid)
+	if src_names[src_rabid] == 'wos':
+		sid = wos_session.get_sid()
+		lookups = wosids.get_details([ exid.exid for exid in exids ], sid)	
+	elif src_names[src_rabid] == 'aa':
+		lookups = dois.get_details([ exid.exid for exid in exids])
+	elif src_names[src_rabid] == 'pubmed':
+		lookups = pmids.get_details([ exid.exid for exid in exids ])
+	else:
+		raise ValueError("Unrecognized source")
 	return jsonify([ lookup.json() for lookup in lookups ])
 
 @app.route('/rabpubs/<short_id>/harvest/<source>', methods=['GET'])
