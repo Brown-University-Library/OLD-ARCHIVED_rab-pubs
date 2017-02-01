@@ -11,6 +11,9 @@ harvest.queries = (function() {
 
       loadQueries, makeQueriesList,
 
+      onClickNewQueryField,
+      makeNewQueryField,
+
       onClickQueryDetailsModal,
       onClickNewQueryModal,
       initializeModel,
@@ -24,6 +27,7 @@ harvest.queries = (function() {
           'sources' : {},
           $modal : $('#modalQueries'),
           $form : $('#modalQueriesForm'),
+          $add_field : $('#addFieldButton')
         };
 
       $.each($sources, function( i, source ) {
@@ -83,40 +87,33 @@ harvest.queries = (function() {
         $target.append($list);     
     };
 
-    onClickQueriesDetailsModal = function ( rabid ) {
-      var
-        $modal, $form,
-        queryObj;
+    // onClickQueriesDetailsModal = function ( rabid ) {
+    //   var
+    //     $modal, $form,
+    //     queryObj;
       
-      $modal = jqueryMap.$modal;
-      $form = jqueryMap.$form;
-      $form.empty();
+    //   $modal = jqueryMap.$modal;
+    //   $form = jqueryMap.$form;
+    //   $form.empty();
 
-      queryObj = configMap.pending_model.get( {'rabid' : rabid.toString() });
-      queryObj.display.details.forEach( function( detailsObj ) {
-          $tr = $('<tr/>');
-          $key = $('<th/>', { 'scope': 'row',
-                              'text' : detailsObj.key });
-          $value = $('<td/>', { 'text' : detailsObj.value });
+    //   queryObj = configMap.pending_model.get( {'rabid' : rabid.toString() });
+    //   queryObj.display.details.forEach( function( detailsObj ) {
+    //       $tr = $('<tr/>');
+    //       $key = $('<th/>', { 'scope': 'row',
+    //                           'text' : detailsObj.key });
+    //       $value = $('<td/>', { 'text' : detailsObj.value });
 
-          $tr.append($key);
-          $tr.append($value);
-          $form.append($tr);
-      });
-      $modal.modal('show');
-    };
+    //       $tr.append($key);
+    //       $tr.append($value);
+    //       $form.append($tr);
+    //   });
+    //   $modal.modal('show');
+    // };
 
-    onClickNewQueryModal = function ( src ) {
+    makeNewQueryField = function ( params ) {
       var
-        $modal, $form, 
         $form_group, $input_group,
-        $select, $text_input,
-        queryObj;
-      
-      $modal = jqueryMap.$modal;
-      $form = jqueryMap.$form;
-      $form.empty();
-      $form.data('source', src);
+        $select, $input;
 
       $form_group = $('<div/>', {'class': 'form-group'});
       $input_group = $('<div/>', {'class': 'input-group search-param'});
@@ -126,21 +123,42 @@ harvest.queries = (function() {
 
       $input_group.append($select).append($text_input);
       $form_group.append($input_group);
-      $form.append($form_group);
 
-      queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
-      queryObj.params.forEach( function( param ) {
-          var $option;
-          $option = $('<option/>', {'value' : param,
-                                    'text'  : param});
-          $select.append($option);
+      params.forEach( function( param ) {
+        var $option;
+        $option = $('<option/>', {'value' : param,
+                                  'text'  : param});
+        $select.append($option);
       });
 
+      return $form_group;
+    };
+
+    onClickNewQueryModal = function ( src ) {
+      var
+        $modal, $form, $form_group,
+        $add_field, queryObj;
+      
+      $modal = jqueryMap.$modal;
+      $form = jqueryMap.$form;
+
+      $form.empty();
+      $form.data('source', src);
+
+      queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
+      $form_group = makeNewQueryField( queryObj.params );
+      $form.append($form_group);
+      
       $modal.modal('show');
     };
 
-    onClickNewQueryField = function () {
+    onClickNewQueryField = function ( $form ) {
+      var src = $form.data('source');
+      queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
+      $form_group = makeNewQueryField( queryObj.params );
+      $form.append($form_group);
 
+      return true;
     };
 
     initializeModel = function () {
@@ -157,6 +175,12 @@ harvest.queries = (function() {
       setJqueryMap();
 
       initializeModel();
+
+      $('#addFieldButton').on('click', function(e){
+        e.preventDefault();
+
+        onClickNewQueryField( jqueryMap.$form );
+      });
 
       $('.new-query-modal-btn').on('click', function(e){
         e.preventDefault();
