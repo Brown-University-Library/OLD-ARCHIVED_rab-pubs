@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/harvest.pending.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/harvest.queries.css') }}">
     <script src="{{ url_for('static', filename='jquery/jquery-3.1.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='jquery/jquery-ui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
@@ -85,13 +86,14 @@
                 </button>
               </div>
               <div class="modal-body">
-                <table id="modalQueriesTable" class="table">
+                <form id="modalQueriesForm">
                   <tbody id="modalQueriesTableBody">
                   </tbody>
-                </table>
+                </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
               </div>
             </div>
           </div>

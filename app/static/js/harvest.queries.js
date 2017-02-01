@@ -23,7 +23,7 @@ harvest.queries = (function() {
         jqueryMap = {
           'sources' : {},
           $modal : $('#modalQueries'),
-          $table : $('#modalQueriesTableBody'),
+          $form : $('#modalQueriesForm'),
         };
 
       $.each($sources, function( i, source ) {
@@ -85,12 +85,12 @@ harvest.queries = (function() {
 
     onClickQueriesDetailsModal = function ( rabid ) {
       var
-        $modal, $table,
+        $modal, $form,
         queryObj;
       
       $modal = jqueryMap.$modal;
-      $table = jqueryMap.$table;
-      $table.empty();
+      $form = jqueryMap.$form;
+      $form.empty();
 
       queryObj = configMap.pending_model.get( {'rabid' : rabid.toString() });
       queryObj.display.details.forEach( function( detailsObj ) {
@@ -101,32 +101,46 @@ harvest.queries = (function() {
 
           $tr.append($key);
           $tr.append($value);
-          $table.append($tr);
+          $form.append($tr);
       });
       $modal.modal('show');
     };
 
     onClickNewQueryModal = function ( src ) {
       var
-        $modal, $table,
+        $modal, $form, 
+        $form_group, $input_group,
+        $select, $text_input,
         queryObj;
       
       $modal = jqueryMap.$modal;
-      $table = jqueryMap.$table;
-      $table.empty();
+      $form = jqueryMap.$form;
+      $form.empty();
+      $form.data('source', src);
+
+      $form_group = $('<div/>', {'class': 'form-group'});
+      $input_group = $('<div/>', {'class': 'input-group search-param'});
+      $select = $('<select/>', { 'class': 'form-control param' });
+      $text_input = $('<input/>', { 'class' : 'form-control param-value',
+                                    'type'  : 'text'});
+
+      $input_group.append($select).append($text_input);
+      $form_group.append($input_group);
+      $form.append($form_group);
 
       queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
       queryObj.params.forEach( function( param ) {
-          $tr = $('<tr/>');
-          $key = $('<th/>', { 'scope': 'row',
-                              'text' : param });
-          $value = $('<td/>', { 'text' : '' });
-
-          $tr.append($key);
-          $tr.append($value);
-          $table.append($tr);
+          var $option;
+          $option = $('<option/>', {'value' : param,
+                                    'text'  : param});
+          $select.append($option);
       });
+
       $modal.modal('show');
+    };
+
+    onClickNewQueryField = function () {
+
     };
 
     initializeModel = function () {

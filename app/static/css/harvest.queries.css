@@ -1,0 +1,11 @@
+#modalQueries .search-param {
+	width: 100%;
+}
+
+#modalQueries .search-param .param {
+	width: 30%;
+}
+
+#modalQueries .search-param .param-value {
+	width: 70%;
+}
