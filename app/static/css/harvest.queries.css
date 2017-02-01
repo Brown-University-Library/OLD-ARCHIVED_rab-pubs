@@ -7,5 +7,9 @@
 }
 
 #modalQueries .search-param .param-value {
-	width: 70%;
+	width: 60%;
+}
+
+#modalQueries .search-param .remove-param {
+	margin-left: 3px;
 }

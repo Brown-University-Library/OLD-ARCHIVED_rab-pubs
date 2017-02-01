@@ -54,7 +54,7 @@ harvest.pending = (function() {
         $modal_btn = $('<button/>', { 'type'        : 'button',
                                       'class'       : 'btn btn-primary details-modal-btn',
                                       'data-exid'   : pendingObj.exid,
-                                      'html'        : '<span class="glyphicon glyphicon-plus"></span>'
+                                      'html'        : '\&plus\;'
                                     });
 
         $col1 = $('<span/>', { 'class' : 'pending-list-col' });

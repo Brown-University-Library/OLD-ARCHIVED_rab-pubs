@@ -12,6 +12,7 @@ harvest.queries = (function() {
       loadQueries, makeQueriesList,
 
       onClickNewQueryField,
+      onClickRemoveQueryField,
       makeNewQueryField,
 
       onClickQueryDetailsModal,
@@ -113,15 +114,23 @@ harvest.queries = (function() {
     makeNewQueryField = function ( params ) {
       var
         $form_group, $input_group,
-        $select, $input;
+        $select, $input, $rmv_button;
 
       $form_group = $('<div/>', {'class': 'form-group'});
       $input_group = $('<div/>', {'class': 'input-group search-param'});
       $select = $('<select/>', { 'class': 'form-control param' });
       $text_input = $('<input/>', { 'class' : 'form-control param-value',
                                     'type'  : 'text'});
+      $rmv_button = $('<button/>', {  'class' : 'btn btn-danger remove-param',
+                                      'type'  : 'button',
+                                      'html'  : '\&times\;' });
 
-      $input_group.append($select).append($text_input);
+      $rmv_button.on('click', function(e) {
+        e.preventDefault();
+        $form_group.remove();
+      });
+
+      $input_group.append($select).append($text_input).append($rmv_button);
       $form_group.append($input_group);
 
       params.forEach( function( param ) {
