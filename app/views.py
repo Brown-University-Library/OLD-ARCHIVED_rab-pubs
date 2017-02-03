@@ -1,4 +1,6 @@
+import os
 import datetime
+import requests
 
 from flask import render_template, jsonify
 from app import app, db
@@ -7,6 +9,9 @@ from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
 from app.harvest import pubmed
 from app.lookup import dois, pmids, wosids
 from app.utils import wos, namespaces
+
+rest_base = app.config['REST_BASE']
+hrv_base = os.path.join(rest_base, 'harvest')
 
 wos_session = wos.Session()
 wos_session.authenticate()
@@ -71,15 +76,21 @@ def list_harvest_processes(short_id, source):
 def create_harvest_process(short_id):
 	user = Users.query.filter_by(short_id=short_id).first()
 	data = request.get_json()
-	new_proc = HarvestProcesses(
-				user_rabid=user.rabid,
-				source_rabid="http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d",
-				status="a",
-				process_data=json.dumps(data)
-				)
-	db.session.add(new_proc)
-	db.session.commit()
-	return jsonify({'id': new_proc.id})
+	data['user'] = user.rabid
+	data['class'] = 'http://vivo.brown.edu/ontology/harvest#HarvestProcess'
+	resp = requests.post(hrv_base, json=data)
+	if resp.status_code == 200:
+		new_proc = HarvestProcesses(
+			user_rabid=user.rabid,
+			source_rabid="http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d",
+			status="a",
+			process_data=json.dumps(data)
+			)
+		db.session.add(new_proc)
+		db.session.commit()
+		return jsonify({'id': new_proc.id})
+	else:
+		return jsonify({"BAD!!!": resp.body})
 
 @app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['GET'])
 def get_harvest_process(short_id, proc_id):
