@@ -17,7 +17,7 @@ wos_session = wos.Session()
 wos_session.authenticate()
 
 
-@app.route('/rabpubs/<short_id>/pending')
+@app.route('/<short_id>/pending')
 def pending(short_id):
 	user = Users.query.filter_by(short_id=short_id).first()
 	sources = HarvestSources.query.all()
@@ -33,7 +33,7 @@ def pending(short_id):
 							user=user,
 							counts=exid_counts_by_source)
 
-@app.route('/rabpubs/<short_id>/pending/<source_id>')
+@app.route('/<short_id>/pending/<source_id>')
 def lookup_pending(short_id, source_id):
 	src_names = {
 		'http://vivo.brown.edu/individual/70209659b6af4980b17ef39884160406': 'wos',
@@ -57,7 +57,7 @@ def lookup_pending(short_id, source_id):
 		raise ValueError("Unrecognized source")
 	return jsonify([ lookup.json() for lookup in lookups ])
 
-@app.route('/rabpubs/<short_id>/queries/<source>', methods=['GET'])
+@app.route('/<short_id>/queries/<source>', methods=['GET'])
 def list_harvest_processes(short_id, source):
 	harvest_params = {
 		'http://vivo.brown.edu/individual/70209659b6af4980b17ef39884160406': ['shoe'],
@@ -72,7 +72,7 @@ def list_harvest_processes(short_id, source):
 	queries = [ {'display': proc.process_data} for proc in procs ]
 	return jsonify({ 'params': params, 'queries': queries })
 
-@app.route('/rabpubs/<short_id>/harvest/', methods=['POST'])
+@app.route('/<short_id>/harvest/', methods=['POST'])
 def create_harvest_process(short_id):
 	user = Users.query.filter_by(short_id=short_id).first()
 	data = request.get_json()
@@ -92,21 +92,21 @@ def create_harvest_process(short_id):
 	else:
 		return jsonify({"BAD!!!": resp.body})
 
-@app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['GET'])
+@app.route('/<short_id>/harvest/<proc_id>', methods=['GET'])
 def get_harvest_process(short_id, proc_id):
 	rabid = namespaces.rabid(proc_id)
 	user = Users.query.filter_by(short_id=short_id).first()
 	proc = HarvestProcesses.query.filter_by(rabid=rabid).first()
 
-@app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['PUT'])
+@app.route('/<short_id>/harvest/<proc_id>', methods=['PUT'])
 def update_harvest_process(short_id, proc_id):
 	pass
 
-@app.route('/rabpubs/<short_id>/harvest/<proc_id>', methods=['DELETE'])
+@app.route('/<short_id>/harvest/<proc_id>', methods=['DELETE'])
 def delete_harvest_process(short_id, proc_id):
 	pass
 
-@app.route('/rabpubs/<short_id>/harvest/<proc_id>/pubmed')
+@app.route('/<short_id>/harvest/<proc_id>/pubmed')
 def run_pubmed_harvest(short_id, proc_id):
 	rabid = namespaces.rabid(proc_id)
 	user = Users.query.filter_by(short_id=short_id).first()
