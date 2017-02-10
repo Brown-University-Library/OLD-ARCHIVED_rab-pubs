@@ -1,11 +1,11 @@
 var harvest = (function () {
 	'use strict';
 
-	var initModule = function ( $container ) {
-		var shortid = $container.data('shortid');
-		
+	var initModule = function ( $container, config ) {		
 		harvest.model.initModule();
-		harvest.data.initModule( shortid );
+
+		harvest.data.configModule( config );
+		harvest.data.initModule();
 		harvest.shell.initModule ( $container );
 	};
 

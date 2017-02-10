@@ -11,6 +11,7 @@ from app.lookup import dois, pmids, wosids
 from app.utils import wos, namespaces
 
 rest_base = app.config['REST_BASE']
+app_base = app.config['APP_BASE']
 hrv_base = os.path.join(rest_base, 'harvest')
 
 wos_session = wos.Session()
@@ -29,9 +30,14 @@ def pending(short_id):
 								'name': source.name,
 								'count': len(exids_by_source[source.rabid])
 								} for source in sources }
+	config_map = {
+		'app_base' : app_base,
+		'short_id'	: short_id
+		}
 	return render_template('harvest.html',
 							user=user,
-							counts=exid_counts_by_source)
+							counts=exid_counts_by_source,
+							config=config_map)
 
 @app.route('/<short_id>/pending/<source_id>')
 def lookup_pending(short_id, source_id):

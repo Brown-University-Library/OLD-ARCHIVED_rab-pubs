@@ -102,7 +102,8 @@
 
       <script>
         $( document ).ready(function() {
-          harvest.initModule( $('body') );
+          var config_map = {{ config }};
+          harvest.initModule( $('body'), config_map );
         });
       </script>
   </body>

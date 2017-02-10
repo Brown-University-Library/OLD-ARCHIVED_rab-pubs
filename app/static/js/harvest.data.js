@@ -3,7 +3,7 @@ harvest.data = (function () {
 	var
 		configMap = {
 			resource_base : "http://vivo.brown.edu/individual/",
-			api_base : null,
+			app_base : null,
       shortid : null
 		},
 
@@ -12,14 +12,15 @@ harvest.data = (function () {
 		initModule, configModule;
 
 	configModule = function ( config ) {
-		configMap.api_base = config.api_base;
+    configMap.shortid = config.short_id;
+		configMap.app_base = config.app_base;
 	};
 
   getPending = function( source ) {
     $.ajax({
       dataType: "json",
       crossDomain: true,
-      url: 'http://localhost:8000/rabpubs/' + configMap.shortid + '/pending/' + source,
+      url: configMap.app_base + configMap.shortid + '/pending/' + source,
       success: function( data ) {
         harvest.model.update_pending( data, source );
       }
@@ -30,16 +31,14 @@ harvest.data = (function () {
     $.ajax({
       dataType: "json",
       crossDomain: true,
-      url: 'http://localhost:8000/rabpubs/' + configMap.shortid + '/queries/' + source,
+      url: configMap.app_base + configMap.shortid + '/queries/' + source,
       success: function( data ) {
         harvest.model.update_queries( data, source );
       }
     });
   };
 
-	initModule = function ( shortid ){
-    configMap.shortid = shortid;
-  };
+	initModule = function () {};
 
 	return {
     getPending : getPending,
