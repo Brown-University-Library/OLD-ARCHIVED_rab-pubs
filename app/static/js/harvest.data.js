@@ -31,7 +31,7 @@ harvest.data = (function () {
     $.ajax({
       dataType: "json",
       crossDomain: true,
-      url: configMap.app_base + configMap.shortid + '/queries/' + source,
+      url: configMap.app_base + configMap.shortid + '/harvest/' + source,
       success: function( data ) {
         harvest.model.update_queries( data, source );
       }
