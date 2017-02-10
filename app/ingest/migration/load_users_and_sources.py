@@ -6,20 +6,88 @@ import sys
 
 vivo_base = "http://vivo.brown.edu/individual/"
 
+wos_params = {
+	'topic':'Topic',
+	'title':'Title',
+	'author':'Author',
+	'author_ids':'Author Identifiers',
+	'group_author':'Group Author',
+	'editor':'Editor',
+	'publication':'Publication Name',
+	'doi':'DOI',
+	'year':'Year Published',
+	'address':'Address',
+	'organizations':'Organizations-Enhanced',
+	'conference':'Conference',
+	'language':'Language',
+	'doc_typ':'Document Type',
+	'funding_agency':'Funding Agency',
+	'grant_number':'Grant Number',
+	'accession_number':'Accession Number',
+	'pmid':'PubMed ID'
+}
+
+pubmed_params = {
+	'title_abstract': 'Title/Abstract',
+	'last_name': 'Author - Last',
+	'isbn': 'ISBN',
+	'mesh_terms': 'MeSH Terms',
+	'affiliation': 'Affiliation',
+	'full_name': 'Author - Full',
+	'mesh_date': 'Date - MeSH',
+	'location_id': 'Location ID',
+	'publication_type': 'Publication Type',
+	'sbj_personal_name': 'Subject - Personal Name',
+	'all_fields': 'All Fields',
+	'first_name': 'Author - First',
+	'entrez_date': 'Date - Entrez',
+	'title': 'Title',
+	'journal': 'Journal',
+	'translit_title': 'Transliterated Title',
+	'investigator_full': 'Investigator - Full',
+	'supplmnt_concept': 'Supplementary Concept',
+	'book': 'Book',
+	'editor': 'Editor',
+	'issue': 'Issue',
+	'ecrn_num': 'EC/RN Number',
+	'text_word': 'Text Word',
+	'other_term': 'Other Term',
+	'grant_num': 'Grant Number',
+	'completed_date': 'Date - Completion',
+	'volume': 'Volume',
+	'mesh_major': 'MeSH Major Topic',
+	'mod_date': 'Date - Modification',
+	'publication_date': 'Date - Publication',
+	'publisher': 'Publisher',
+	'pagination': 'Pagination',
+	'mesh_subhead': 'MeSH Subheading',
+	'language': 'Language',
+	'investigator': 'Investigator',
+	'secondary_src_id': 'Secondary Source ID',
+	'pharma_action': 'Pharmacological Action',
+	'filter_param': 'Filter',
+	'created_date': 'Date - Create',
+	'author_id': 'Author - Identifier',
+	'corporate': 'Author - Corporate'
+}
+
 def main(userFile):
 	pubmed = HarvestSources()
 	pubmed.rabid = vivo_base + uuid.uuid4().hex
 	pubmed.name = "PubMed"
+	pubmed.params = pubmed_params
 	db.session.add(pubmed)
 
 	wos = HarvestSources()
 	wos.rabid = vivo_base + uuid.uuid4().hex
 	wos.name = "Web of Science"
+	wos.params = wos_params
 	db.session.add(wos)
 
 	acad = HarvestSources()
 	acad.rabid = vivo_base + uuid.uuid4().hex
 	acad.name = "Academic Analytics"
+	acad.params = {}
 	db.session.add(acad)
 
 	db.session.commit()

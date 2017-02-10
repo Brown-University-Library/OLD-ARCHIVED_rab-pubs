@@ -58,6 +58,7 @@ class HarvestSources(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
 	name = db.Column(db.String(255))
+	params = db.Column(db.PickleType)
 	processes = db.relationship('HarvestProcesses',
 									backref='source', 
 									lazy='dynamic')

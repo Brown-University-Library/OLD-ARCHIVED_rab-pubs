@@ -72,7 +72,8 @@ drop table if exists harvest_sources;
 create table harvest_sources (
     id integer primary key autoincrement,
     rabid varchar not null,
-    name varchar not null
+    name varchar not null,
+    params blob
 );
 
 create index user_rabids on users(rabid);
