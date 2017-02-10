@@ -102,7 +102,7 @@
 
       <script>
         $( document ).ready(function() {
-          var config_map = {{ config }};
+          var config_map = {{ config|tojson|safe }};
           harvest.initModule( $('body'), config_map );
         });
       </script>
