@@ -59,7 +59,7 @@ def lookup_pending(short_id, source_id):
 		raise ValueError("Unrecognized source")
 	return jsonify([ lookup.json() for lookup in lookups ])
 
-@app.route('/<short_id>/harvest/<source>', methods=['GET'])
+@app.route('/<short_id>/harvest/<source>/', methods=['GET'])
 def list_harvest_processes(short_id, source):
 	src_rabid = namespaces.rabid(source)
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
@@ -68,27 +68,38 @@ def list_harvest_processes(short_id, source):
 				user_rabid=user.rabid, source_rabid=src_rabid).all()
 	queries = [ {'display': proc.process_data} for proc in procs ]
 	return jsonify(
-		{ 'params': src.params.values(),'queries': queries })
+		{ 'params': src.params,'queries': queries })
 
 @app.route('/<short_id>/harvest/<source>', methods=['POST'])
 def create_harvest_process(short_id, source):
+	src_rabid = namespaces.rabid(source)
+	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
 	data = request.get_json()
 	data['user'] = user.rabid
-	data['class'] = 'http://vivo.brown.edu/ontology/harvest#HarvestProcess'
-	resp = requests.post(hrv_base, json=data)
-	if resp.status_code == 200:
-		new_proc = HarvestProcesses(
-			user_rabid=user.rabid,
-			source_rabid="http://vivo.brown.edu/individual/1b404f6f24b449688bed96f0b2587d4d",
-			status="a",
-			process_data=json.dumps(data)
-			)
-		db.session.add(new_proc)
-		db.session.commit()
-		return jsonify({'id': new_proc.id})
+	data['class'] = [namespaces.bharvest('HarvestProcess')]
+	if src.name == 'Web of Science':
+		data['class'].append(namespaces.bharvest('WosSearch'))
+		rabdata_api = os.path.join(hrv_base,'wos')	
+	elif src.name == 'PubMed':
+		data['class'].append(namespaces.bharvest('PubmedSearch'))
+		rabdata_api = os.path.join(hrv_base,'pubmed')
 	else:
-		return jsonify({"BAD!!!": resp.body})
+		raise ValueError("Unrecognized source")
+	return jsonify({"api":rabdata_api, "payload": data })
+	# resp = requests.post(rabdata_api, json=data)
+	# if resp.status_code == 200:
+	# 	new_proc = HarvestProcesses(
+	# 		user_rabid=user.rabid,
+	# 		source_rabid=src.rabid,
+	# 		status="a",
+	# 		process_data=json.dumps(data)
+	# 		)
+	# 	db.session.add(new_proc)
+	# 	db.session.commit()
+	# 	return jsonify({'id': new_proc.id})
+	# else:
+	# 	return jsonify({"BAD!!!": resp.body})
 
 @app.route('/<short_id>/harvest/<proc_id>', methods=['GET'])
 def get_harvest_process(short_id, proc_id):

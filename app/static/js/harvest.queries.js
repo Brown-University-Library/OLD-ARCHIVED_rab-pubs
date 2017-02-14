@@ -17,6 +17,7 @@ harvest.queries = (function() {
 
       onClickQueryDetailsModal,
       onClickNewQueryModal,
+      onClickSubmitNewQuery,
       initializeModel,
       setJqueryMap, initModule;
 
@@ -133,12 +134,12 @@ harvest.queries = (function() {
       $input_group.append($select).append($text_input).append($rmv_button);
       $form_group.append($input_group);
 
-      params.forEach( function( param ) {
+      for (const attr of Object.keys(params)) {
         var $option;
-        $option = $('<option/>', {'value' : param,
-                                  'text'  : param});
+        $option = $('<option/>', {'value' : attr,
+                                  'text'  : params[attr]});
         $select.append($option);
-      });
+      };
 
       return $form_group;
     };
@@ -168,6 +169,10 @@ harvest.queries = (function() {
       $form.append($form_group);
 
       return true;
+    };
+
+    onClickSubmitNewQuery = function ( $form ) {
+
     };
 
     initializeModel = function () {

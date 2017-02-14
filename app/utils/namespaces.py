@@ -10,3 +10,8 @@ def rabid(strData):
 	uri_prefix = "http://vivo.brown.edu/individual/"
 	ns = "rabid-"
 	return uriOrNamespace(strData, uri_prefix, ns)
+
+def bharvest(strData):
+	uri_prefix = "http://vivo.brown.edu/ontology/harvest#"
+	ns = "bharvest-"
+	return uriOrNamespace(strData, uri_prefix, ns)

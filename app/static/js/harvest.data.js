@@ -8,7 +8,8 @@ harvest.data = (function () {
 		},
 
     get,
-    getPending,
+    getPending, getQueries,
+    postQuery,
 		initModule, configModule;
 
 	configModule = function ( config ) {
@@ -34,6 +35,20 @@ harvest.data = (function () {
       url: configMap.app_base + configMap.shortid + '/harvest/' + source,
       success: function( data ) {
         harvest.model.update_queries( data, source );
+      }
+    });
+  };
+
+  postQuery = function( source, data ) {
+    $.ajax({
+      method: "POST",
+      data: data,
+      dataType: "json",
+      crossDomain: true,
+      url: configMap.app_base + configMap.shortid + '/harvest/' + source,
+      success: function( data ) {
+        console.log(data);
+        // harvest.model.update_queries( data, source );
       }
     });
   };
