@@ -148,6 +148,7 @@ harvest.queries = (function() {
     onClickNewQueryModal = function ( src ) {
       var
         $modal, $form, $form_group,
+        $label_group, $label_name, $label_input,
         $add_field, queryObj;
       
       $modal = jqueryMap.$modal;
@@ -155,6 +156,17 @@ harvest.queries = (function() {
 
       $form.empty();
       $form.data('source', src);
+
+      $label_group = $('<div/>', {'class': 'form-group search-param'});
+      $label_name = $('<label/>', { 'class' : 'param',
+                                    'for'   : 'queryLabel',
+                                    'text'  : 'name'});
+      $label_input = $('<input/>', {'class' : 'form-control param-value',
+                                    'type'  : 'text',
+                                    'id'    : 'queryLabel',
+                                    'value' : 'Default search'});
+      $label_group.append($label_name).append($label_input);
+      $form.append($label_group);
 
       queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
       $form_group = makeNewQueryField( queryObj.params );
@@ -176,6 +188,8 @@ harvest.queries = (function() {
       var
         $inputs, src,
         form_data = {};
+
+      form_data['label'] = $form.find('#queryLabel').val();
 
       $inputs = $form.find('.input-group');
       $inputs.each( function( idx ) {
