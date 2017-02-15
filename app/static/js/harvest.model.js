@@ -62,7 +62,9 @@ harvest.model = (function () {
 
 	queries = (function () {
 		var
-			get, all, initialize;
+			get, all,
+			create,
+			initialize;
 
 		get = function ( paramObj ) {
 			var data;
@@ -76,17 +78,26 @@ harvest.model = (function () {
 
 			data = queries_db( paramObj ).get();
 			return data;
-		}
+		};
+
+		create = function ( sourceRabid, dataObj ) {
+			harvest.data.postQuery( sourceRabid, dataObj);
+		};
+
+		save = function ( sourceRabid, dataObj ) {
+
+		};
 
 		initialize = function ( sourceRabid ) {
 			harvest.data.getQueries( sourceRabid );
-		}
+		};
 
 		return {
 			get : get,
 			all : all,
+			create: create,
 			initialize : initialize
-		}
+		};
 	}());
 
 	initModule = function () {};

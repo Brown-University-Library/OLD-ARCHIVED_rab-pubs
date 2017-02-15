@@ -29,6 +29,7 @@ harvest.queries = (function() {
           'sources' : {},
           $modal : $('#modalQueries'),
           $form : $('#modalQueriesForm'),
+          $save_query : $('#saveQueryButton'),
           $add_field : $('#addFieldButton')
         };
 
@@ -171,8 +172,22 @@ harvest.queries = (function() {
       return true;
     };
 
-    onClickSubmitNewQuery = function ( $form ) {
+    onClickSaveQuery = function ( $form ) {
+      var
+        $inputs, src,
+        form_data = {};
 
+      $inputs = $form.find('.input-group');
+      $inputs.forEach( function( $input ) {
+        var param, param_val;
+        param = $input.find('select option:selected').val();
+        param_val = $input.find('input.param-value').val();
+
+        form_data[param] = param_val;
+      });
+
+      src = $form.data('source');
+      configMap.queries_model.create(src, form_data);
     };
 
     initializeModel = function () {
@@ -189,6 +204,12 @@ harvest.queries = (function() {
       setJqueryMap();
 
       initializeModel();
+
+      $('#saveQueryButton').on('click', function(e){
+        e.preventDefault();
+
+        onClickSaveQuery( jqueryMap.$form );
+      });
 
       $('#addFieldButton').on('click', function(e){
         e.preventDefault();
