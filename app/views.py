@@ -2,7 +2,7 @@ import os
 import datetime
 import requests
 
-from flask import render_template, jsonify
+from flask import request, render_template, jsonify
 from app import app, db
 from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
 
@@ -59,7 +59,7 @@ def lookup_pending(short_id, source_id):
 		raise ValueError("Unrecognized source")
 	return jsonify([ lookup.json() for lookup in lookups ])
 
-@app.route('/<short_id>/harvest/<source>/', methods=['GET'])
+@app.route('/<short_id>/harvest/<source>', methods=['GET'])
 def list_harvest_processes(short_id, source):
 	src_rabid = namespaces.rabid(source)
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
@@ -77,16 +77,16 @@ def create_harvest_process(short_id, source):
 	user = Users.query.filter_by(short_id=short_id).first()
 	data = request.get_json()
 	data['user'] = user.rabid
-	data['class'] = [namespaces.bharvest('HarvestProcess')]
+	data['class'] = [ namespaces.bharvest('bharvest-HarvestProcess') ]
 	if src.name == 'Web of Science':
-		data['class'].append(namespaces.bharvest('WosSearch'))
+		data['class'].append(namespaces.bharvest('bharvest-WosSearch'))
 		rabdata_api = os.path.join(hrv_base,'wos')	
 	elif src.name == 'PubMed':
-		data['class'].append(namespaces.bharvest('PubmedSearch'))
+		data['class'].append(namespaces.bharvest('bharvest-PubmedSearch'))
 		rabdata_api = os.path.join(hrv_base,'pubmed')
 	else:
 		raise ValueError("Unrecognized source")
-	return jsonify({"api":rabdata_api, "payload": data })
+	return jsonify({ "api": rabdata_api, "payload": data })
 	# resp = requests.post(rabdata_api, json=data)
 	# if resp.status_code == 200:
 	# 	new_proc = HarvestProcesses(

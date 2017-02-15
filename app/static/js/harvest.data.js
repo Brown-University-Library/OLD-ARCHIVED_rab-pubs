@@ -39,15 +39,16 @@ harvest.data = (function () {
     });
   };
 
-  postQuery = function( source, data ) {
+  postQuery = function( source, postData ) {
     $.ajax({
       method: "POST",
-      data: data,
+      data: JSON.stringify(postData),
+      contentType:"application/json; charset=utf-8",
       dataType: "json",
       crossDomain: true,
       url: configMap.app_base + configMap.shortid + '/harvest/' + source,
-      success: function( data ) {
-        console.log(data);
+      success: function( respData ) {
+        console.log(respData);
         // harvest.model.update_queries( data, source );
       }
     });
@@ -58,6 +59,7 @@ harvest.data = (function () {
 	return {
     getPending : getPending,
     getQueries : getQueries,
+    postQuery : postQuery,
     configModule : configModule,
 		initModule : initModule
 	};

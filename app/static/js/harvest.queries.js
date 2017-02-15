@@ -178,10 +178,10 @@ harvest.queries = (function() {
         form_data = {};
 
       $inputs = $form.find('.input-group');
-      $inputs.forEach( function( $input ) {
+      $inputs.each( function( idx ) {
         var param, param_val;
-        param = $input.find('select option:selected').val();
-        param_val = $input.find('input.param-value').val();
+        param = $(this).find('select option:selected').val();
+        param_val = $(this).find('input.param-value').val();
 
         form_data[param] = param_val;
       });
