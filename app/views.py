@@ -76,19 +76,24 @@ def create_harvest_process(short_id, source):
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
 	data = request.get_json()
-	data['user'] = user.rabid
-	data['class'] = [ namespaces.bharvest('bharvest-HarvestProcess') ]
+	for k, v in data.items():
+		if isinstance(v, unicode):
+			data[k] = [ v ]
+	for k in src.params.keys():
+		if k not in data:
+			data[k] = []
+	data['user'] = [ user.rabid ]
+	data['class']= [ namespaces.bharvest('bharvest-HarvestProcess') ]
 	if src.name == 'Web of Science':
-		data['class'].append(namespaces.bharvest('bharvest-WosSearch'))
-		rabdata_api = os.path.join(hrv_base,'wos')	
+		data['class'].append(namespaces.bharvest('bharvest-WebOfScienceSearch'))
+		rabdata_api = os.path.join(hrv_base,'wos/')	
 	elif src.name == 'PubMed':
-		data['class'].append(namespaces.bharvest('bharvest-PubmedSearch'))
-		rabdata_api = os.path.join(hrv_base,'pubmed')
+		data['class'].append(namespaces.bharvest('bharvest-PubMedSearch'))
+		rabdata_api = os.path.join(hrv_base,'pubmed/')
 	else:
 		raise ValueError("Unrecognized source")
-	return jsonify({ "api": rabdata_api, "payload": data })
-	# resp = requests.post(rabdata_api, json=data)
-	# if resp.status_code == 200:
+	resp = requests.post(rabdata_api, json=data)
+	if resp.status_code == 200:
 	# 	new_proc = HarvestProcesses(
 	# 		user_rabid=user.rabid,
 	# 		source_rabid=src.rabid,
@@ -97,9 +102,9 @@ def create_harvest_process(short_id, source):
 	# 		)
 	# 	db.session.add(new_proc)
 	# 	db.session.commit()
-	# 	return jsonify({'id': new_proc.id})
-	# else:
-	# 	return jsonify({"BAD!!!": resp.body})
+		return jsonify(resp.json())
+#	else:
+		return jsonify({"BAD!!!": resp.body})
 
 @app.route('/<short_id>/harvest/<proc_id>', methods=['GET'])
 def get_harvest_process(short_id, proc_id):
