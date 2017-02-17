@@ -94,17 +94,17 @@ def create_harvest_process(short_id, source):
 		raise ValueError("Unrecognized source")
 	resp = requests.post(rabdata_api, json=data)
 	if resp.status_code == 200:
-	# 	new_proc = HarvestProcesses(
-	# 		user_rabid=user.rabid,
-	# 		source_rabid=src.rabid,
-	# 		status="a",
-	# 		process_data=json.dumps(data)
-	# 		)
-	# 	db.session.add(new_proc)
-	# 	db.session.commit()
+		new_proc = HarvestProcesses()
+		new_proc.rabid = resp.json().keys()[0]
+		new_proc.user_rabid = user.rabid
+		new_proc.source_rabid = src.rabid
+		new_proc.status = "a"
+		new_proc.process_data = 'testing'
+		db.session.add(new_proc)
+		db.session.commit()
 		return jsonify(resp.json())
-#	else:
-		return jsonify({"BAD!!!": resp.body})
+	else:
+		return jsonify({"BAD!!!": resp.text})
 
 @app.route('/<short_id>/harvest/<proc_id>', methods=['GET'])
 def get_harvest_process(short_id, proc_id):
