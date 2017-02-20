@@ -11,6 +11,7 @@ harvest.model = (function () {
 
 	pending_db = TAFFY();
 	queries_db = TAFFY();
+        params_db = TAFFY();
 
 	update_pending = function ( data, source ) {
 		data.forEach( function ( pendingObj ) {
@@ -22,7 +23,7 @@ harvest.model = (function () {
 
 	update_queries = function ( data, source ) {
 		var params = data.params;
-		queries_db.insert( {'source': source, 'params': params, 'new': true });
+		params_db.insert( {'source': source, 'params': params });
 		var queries = data.queries;
 		queries.forEach( function ( queryObj ) {
 			queryObj.source = source;
@@ -100,12 +101,39 @@ harvest.model = (function () {
 		};
 	}());
 
+        params = (function () {
+		var
+			get, all,
+			create,
+			initialize;
+
+		get = function ( paramObj ) {
+			var data;
+
+			data = params_db( paramObj ).first();
+			return data;
+		};
+
+		all = function ( paramObj ) {
+			var data;
+
+			data = params_db( paramObj ).get();
+			return data;
+		};
+
+		return {
+			get : get,
+			all : all,
+		};
+	}());
+
 	initModule = function () {};
 
 	return {
 		initModule : initModule,
 		pending : pending,
 		queries : queries,
+		params : params,
 		update_queries : update_queries,
 		update_pending : update_pending
 	};

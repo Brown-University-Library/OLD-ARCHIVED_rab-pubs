@@ -2,7 +2,8 @@ harvest.queries = (function() {
 
     var
       configMap = {
-        queries_model : null
+        queries_model : null,
+        params_model : null
       },
 
       stateMap = {},
@@ -48,15 +49,14 @@ harvest.queries = (function() {
         var $li, $title, $modal_btn;
 
         $li = $('<li/>', {  'class'       : 'list-group-item queries-list-item',
-                            'data-source' : queryObj.source,
-                            'data-exid'   : pendingObj.exid,
+                            'data-source' : queryObj.source
                           });
         $title = $('<h5/>', { 'class' : 'queries-title',
-                                'text'  : queryObj.display.short.title });
+                                'text'  : queryObj.display });
         $modal_btn = $('<button/>', { 'type'        : 'button',
                                       'class'       : 'btn btn-primary query-modal-btn',
                                       'data-rabid'   : queryObj.rabid,
-                                      'html'        : 'Search details'
+                                      'html'        : '\&plus\;'
                                     });
 
         $modal_btn.on('click', function(e) {
@@ -90,7 +90,7 @@ harvest.queries = (function() {
         $target.append($list);     
     };
 
-    // onClickQueriesDetailsModal = function ( rabid ) {
+    onClickQueriesDetailsModal = function ( rabid ) {
     //   var
     //     $modal, $form,
     //     queryObj;
@@ -111,7 +111,7 @@ harvest.queries = (function() {
     //       $form.append($tr);
     //   });
     //   $modal.modal('show');
-    // };
+    };
 
     makeNewQueryField = function ( params ) {
       var
@@ -168,7 +168,7 @@ harvest.queries = (function() {
       $label_group.append($label_name).append($label_input);
       $form.append($label_group);
 
-      queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
+      queryObj = configMap.params_model.get( {'source' : src.toString() });
       $form_group = makeNewQueryField( queryObj.params );
       $form.append($form_group);
       
@@ -177,7 +177,7 @@ harvest.queries = (function() {
 
     onClickNewQueryField = function ( $form ) {
       var src = $form.data('source');
-      queryObj = configMap.queries_model.get( {'source' : src.toString(), 'new': true });
+      queryObj = configMap.params_model.get( {'source' : src.toString() });
       $form_group = makeNewQueryField( queryObj.params );
       $form.append($form_group);
 
@@ -212,6 +212,7 @@ harvest.queries = (function() {
 
     configModule = function ( map ) {
       configMap.queries_model = map.queries_model;
+      configMap.params_model = map.params_model;
     };
 
     initModule = function () {

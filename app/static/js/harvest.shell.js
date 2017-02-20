@@ -49,7 +49,8 @@ harvest.shell = (function () {
     harvest.pending.initModule( jqueryMap.$container );
 
     harvest.queries.configModule({
-      queries_model : harvest.model.queries
+      queries_model : harvest.model.queries,
+      params_model : harvest.model.params
     });
     harvest.queries.initModule( jqueryMap.$container );
 
@@ -57,9 +58,9 @@ harvest.shell = (function () {
       onPendingQueryCompleted( source );
     });
 
-    // $( window ).on( 'queriesQueryCompleted', function( e, source) {
-    //   onQueriesQueryCompleted( source );
-    // });
+    $( window ).on( 'queriesQueryCompleted', function( e, source) {
+       onQueriesQueryCompleted( source );
+    });
 
   };
   return { initModule : initModule };
