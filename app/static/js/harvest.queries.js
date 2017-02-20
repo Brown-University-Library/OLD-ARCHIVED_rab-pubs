@@ -31,7 +31,6 @@ harvest.queries = (function() {
           $modal : $('#modalQueries'),
           $form : $('#modalQueriesForm'),
           $save_query : $('#saveQueryButton'),
-          $add_field : $('#addFieldButton')
         };
 
       $.each($sources, function( i, source ) {
@@ -62,7 +61,7 @@ harvest.queries = (function() {
         $modal_btn.on('click', function(e) {
           e.preventDefault();
 
-          var exid = $( this ).data('rabid');
+          var rabid = $( this ).data('rabid');
           onClickQueryDetailsModal( rabid );
         });
 
@@ -90,27 +89,30 @@ harvest.queries = (function() {
         $target.append($list);     
     };
 
-    onClickQueriesDetailsModal = function ( rabid ) {
-    //   var
-    //     $modal, $form,
-    //     queryObj;
+    onClickQueryDetailsModal = function ( rabid ) {
+       var
+         $modal, $table,
+         queryObj;
       
-    //   $modal = jqueryMap.$modal;
-    //   $form = jqueryMap.$form;
-    //   $form.empty();
+       $modal = jqueryMap.$modal;
+       $table = $('<table/>');
+       $body = $modal.find('.model-body');
+       $body.empty()
 
-    //   queryObj = configMap.pending_model.get( {'rabid' : rabid.toString() });
-    //   queryObj.display.details.forEach( function( detailsObj ) {
-    //       $tr = $('<tr/>');
-    //       $key = $('<th/>', { 'scope': 'row',
-    //                           'text' : detailsObj.key });
-    //       $value = $('<td/>', { 'text' : detailsObj.value });
+       queryObj = configMap.queries_model.get( {'rabid' : rabid.toString() });
+       queryObj.display.details.forEach( function( detailsObj ) {
+           $tr = $('<tr/>');
+           $key = $('<th/>', { 'scope': 'row',
+                               'text' : detailsObj.key });
+           $value = $('<td/>', { 'text' : detailsObj.value });
 
-    //       $tr.append($key);
-    //       $tr.append($value);
-    //       $form.append($tr);
-    //   });
-    //   $modal.modal('show');
+           $tr.append($key);
+           $tr.append($value);
+           $table.append($tr);
+       });
+
+       $body.append($table);
+       $modal.modal('show');
     };
 
     makeNewQueryField = function ( params ) {
@@ -152,9 +154,10 @@ harvest.queries = (function() {
         $add_field, queryObj;
       
       $modal = jqueryMap.$modal;
-      $form = jqueryMap.$form;
+      $body = $modal.find('.modal-body');
+      $body.empty()
+      $form = $('<form/>');
 
-      $form.empty();
       $form.data('source', src);
 
       $label_group = $('<div/>', {'class': 'form-group search-param'});
@@ -172,6 +175,17 @@ harvest.queries = (function() {
       $form_group = makeNewQueryField( queryObj.params );
       $form.append($form_group);
       
+      $body.append($form);
+
+      $add_field_btn = $('<button/>', {	'type'	: 'button',
+					'class'	: 'btn btn-primary',
+					'text'	: '\&plus\;' });
+      $add_field_btn.on('click', function(e) {
+	e.preventDefault();
+        onClickNewQueryField($form);
+      });
+
+      $body.append($add_field_btn);
       $modal.modal('show');
     };
 
@@ -222,14 +236,8 @@ harvest.queries = (function() {
 
       $('#saveQueryButton').on('click', function(e){
         e.preventDefault();
-
-        onClickSaveQuery( jqueryMap.$form );
-      });
-
-      $('#addFieldButton').on('click', function(e){
-        e.preventDefault();
-
-        onClickNewQueryField( jqueryMap.$form );
+        var $form = jqueryMap.$modal.find('form');
+        onClickSaveQuery( $form );
       });
 
       $('.new-query-modal-btn').on('click', function(e){

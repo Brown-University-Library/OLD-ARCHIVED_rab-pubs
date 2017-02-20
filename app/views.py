@@ -66,7 +66,9 @@ def list_harvest_processes(short_id, source):
 	user = Users.query.filter_by(short_id=short_id).first()
 	procs = HarvestProcesses.query.filter_by(
 				user_rabid=user.rabid, source_rabid=src.rabid).all()
-	queries = [ {'display': proc.process_data} for proc in procs ]
+	queries = [ {	'display': proc.process_data,
+			'rabid': namespaces.RABID(proc.rabid).local_name }
+				for proc in procs ]
 	return jsonify(
 		{ 'params': src.params,'queries': queries })
 
