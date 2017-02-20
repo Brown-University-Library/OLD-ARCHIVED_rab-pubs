@@ -26,7 +26,7 @@ def pending(short_id):
 	exids_by_source = { source.rabid: []  for source in sources }
 	for exid in exids:
 		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
-	exid_counts_by_source = { namespaces.rabid(source.rabid): {
+	exid_counts_by_source = { namespaces.RABID(source.rabid).local_name: {
 								'name': source.name,
 								'count': len(exids_by_source[source.rabid])
 								} for source in sources }
@@ -41,7 +41,7 @@ def pending(short_id):
 
 @app.route('/<short_id>/pending/<source_id>')
 def lookup_pending(short_id, source_id):
-	src_rabid = namespaces.rabid(source_id)
+	src_rabid = namespaces.RABID(source_id).uri
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
 	exids = HarvestExids.query.filter_by(
@@ -61,7 +61,7 @@ def lookup_pending(short_id, source_id):
 
 @app.route('/<short_id>/harvest/<source>', methods=['GET'])
 def list_harvest_processes(short_id, source):
-	src_rabid = namespaces.rabid(source)
+	src_rabid = namespaces.RABID(source).uri
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
 	procs = HarvestProcesses.query.filter_by(
@@ -72,7 +72,7 @@ def list_harvest_processes(short_id, source):
 
 @app.route('/<short_id>/harvest/<source>', methods=['POST'])
 def create_harvest_process(short_id, source):
-	src_rabid = namespaces.rabid(source)
+	src_rabid = namespaces.RABID(source).uri
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
 	data = request.get_json()
@@ -83,12 +83,12 @@ def create_harvest_process(short_id, source):
 		if k not in data:
 			data[k] = []
 	data['user'] = [ user.rabid ]
-	data['class']= [ namespaces.bharvest('bharvest-HarvestProcess') ]
+	data['class']= [ namespaces.BHARVEST('HarvestProcess').uri ]
 	if src.name == 'Web of Science':
-		data['class'].append(namespaces.bharvest('bharvest-WebOfScienceSearch'))
+		data['class'].append( namespaces.BHARVEST('WebOfScienceSearch').uri )
 		rabdata_api = os.path.join(hrv_base,'wos/')	
 	elif src.name == 'PubMed':
-		data['class'].append(namespaces.bharvest('bharvest-PubMedSearch'))
+		data['class'].append( namespaces.BHARVEST('bharvest-PubMedSearch').uri )
 		rabdata_api = os.path.join(hrv_base,'pubmed/')
 	else:
 		raise ValueError("Unrecognized source")
@@ -106,11 +106,20 @@ def create_harvest_process(short_id, source):
 	else:
 		return jsonify({"BAD!!!": resp.text})
 
-@app.route('/<short_id>/harvest/<proc_id>', methods=['GET'])
-def get_harvest_process(short_id, proc_id):
-	rabid = namespaces.rabid(proc_id)
+@app.route('/<short_id>/harvest/<source>/<proc_id>', methods=['GET'])
+def get_harvest_process(short_id, source, proc_id):
+	proc_rabid = namespaces.RABID(proc_id).uri
+	proc = HarvestProcesses.query.filter_by(rabid=proc_rabid).first()
+	src_rabid = namespaces.RABID(source).uri
+	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
-	proc = HarvestProcesses.query.filter_by(rabid=rabid).first()
+	if src.name == 'Web of Science':
+		rabdata_api = os.path.join(hrv_base,'wos/')	
+	elif src.name == 'PubMed':
+		rabdata_api = os.path.join(hrv_base,'pubmed/')
+	else:
+		raise ValueError("Unrecognized source")
+	resp = requests.get(rabdata_api)
 
 @app.route('/<short_id>/harvest/<proc_id>', methods=['PUT'])
 def update_harvest_process(short_id, proc_id):
@@ -122,6 +131,6 @@ def delete_harvest_process(short_id, proc_id):
 
 @app.route('/<short_id>/harvest/<proc_id>/pubmed')
 def run_pubmed_harvest(short_id, proc_id):
-	rabid = namespaces.rabid(proc_id)
+	rabid = namespaces.RABID(proc_id)
 	user = Users.query.filter_by(short_id=short_id).first()
 	proc = HarvestProcesses.query.filter_by(rabid=rabid).first()
