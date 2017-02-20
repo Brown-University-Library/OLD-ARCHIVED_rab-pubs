@@ -65,7 +65,7 @@ def list_harvest_processes(short_id, source):
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
 	procs = HarvestProcesses.query.filter_by(
-				user_rabid=user.rabid, source_rabid=src_rabid).all()
+				user_rabid=user.rabid, source_rabid=src.rabid).all()
 	queries = [ {'display': proc.process_data} for proc in procs ]
 	return jsonify(
 		{ 'params': src.params,'queries': queries })
@@ -94,12 +94,13 @@ def create_harvest_process(short_id, source):
 		raise ValueError("Unrecognized source")
 	resp = requests.post(rabdata_api, json=data)
 	if resp.status_code == 200:
+		new_proc_rabid = resp.json().keys()[0]
 		new_proc = HarvestProcesses()
-		new_proc.rabid = resp.json().keys()[0]
+		new_proc.rabid = new_proc_rabid
 		new_proc.user_rabid = user.rabid
 		new_proc.source_rabid = src.rabid
 		new_proc.status = "a"
-		new_proc.process_data = 'testing'
+		new_proc.process_data = resp.json()[new_proc_rabid]['label'][0]
 		db.session.add(new_proc)
 		db.session.commit()
 		return jsonify(resp.json())
