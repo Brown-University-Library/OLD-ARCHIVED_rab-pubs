@@ -73,15 +73,26 @@ def list_harvest_processes(short_id, source):
 	else:
 		raise ValueError("Unrecognized source")
 	payload = { 'user' : user.rabid }
-	resp = requests.get( rabdata_api, params=payload )
-	if resp.status_code == 200:
-		data = resp.json()
+	index_resp = requests.get( rabdata_api, params=payload )
+	if index_resp.status_code == 200:
+		data = index_resp.json()
 		queries = []
 		for d in data:
 			query_rabid = d.keys()[0]
-			query_data = d[ query_rabid ]
-			query_data['rabid'] = namespaces.RABID(query_rabid).local_name
-			queries.append(query_data)
+			query_id = namespaces.RABID(query_rabid).id
+			retr_resp = requests.get( rabdata_api + query_id )
+			if retr_resp.status_code == 200:
+				retr_data = retr_resp.json()
+				try:
+					query_data = retr_data[ query_rabid ]
+				except KeyError:
+					raise
+				del query_data['user']
+				del query_data['class']
+				query_data['rabid'] = namespaces.RABID(query_rabid).local_name
+				queries.append(query_data)
+			else:
+				continue
 	else:
 		return 400
 	return jsonify(
@@ -126,18 +137,26 @@ def create_harvest_process(short_id, source):
 
 @app.route('/<short_id>/harvest/<source>/<proc_id>', methods=['GET'])
 def get_harvest_process(short_id, source, proc_id):
-	proc_rabid = namespaces.RABID(proc_id).uri
-	proc = HarvestProcesses.query.filter_by(rabid=proc_rabid).first()
+	proc_id = namespaces.RABID(proc_id).id
 	src_rabid = namespaces.RABID(source).uri
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
-	user = Users.query.filter_by(short_id=short_id).first()
 	if src.name == 'Web of Science':
 		rabdata_api = os.path.join(hrv_base,'wos/')	
 	elif src.name == 'PubMed':
 		rabdata_api = os.path.join(hrv_base,'pubmed/')
 	else:
 		raise ValueError("Unrecognized source")
-	resp = requests.get(rabdata_api)
+	resp = requests.get( rabdata_api + proc_id )
+	if resp.status_code == 200:
+		rab_obj = resp.json()
+		rabid = rab_obj.keys()[0]
+		data = rab_obj[rabid]
+		del data['class']
+		del data['user']
+		data['rabid'] = namespaces.RABID(rabid).local_name
+		return jsonify(data)
+	else:
+		return 400
 
 @app.route('/<short_id>/harvest/<proc_id>', methods=['PUT'])
 def update_harvest_process(short_id, proc_id):

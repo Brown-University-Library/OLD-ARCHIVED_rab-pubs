@@ -96,20 +96,24 @@ harvest.queries = (function() {
       
        $modal = jqueryMap.$modal;
        $table = $('<table/>');
-       $body = $modal.find('.model-body');
+       $body = $modal.find('.modal-body');
        $body.empty()
 
        queryObj = configMap.queries_model.get( {'rabid' : rabid.toString() });
        data = queryObj.data;
        for (const attr of Object.keys(data)) {
-           $tr = $('<tr/>');
-           $key = $('<th/>', { 'scope': 'row',
-                               'text' : attr });
-           $value = $('<td/>', { 'text' : data[ attr ] });
+           if (data[ attr ].length === 0 ) {
+             continue;
+           } else {
+             $tr = $('<tr/>');
+             $key = $('<th/>', { 'scope': 'row',
+                                 'text' : attr });
+             $value = $('<td/>', { 'text' : data[ attr ] });
 
-           $tr.append($key);
-           $tr.append($value);
-           $table.append($tr);
+             $tr.append($key);
+             $tr.append($value);
+             $table.append($tr);
+	  }
        };
 
        $body.append($table);

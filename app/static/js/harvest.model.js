@@ -26,8 +26,9 @@ harvest.model = (function () {
 		params_db.insert( {'source': source, 'params': params });
 		var queries = data.queries;
 		queries.forEach( function ( queryObj ) {
-			queryObj.source = source;
-			queries_db.insert( { 	'rabid'	: queryObj.rabid,
+			var rabid = queryObj.rabid;
+			delete queryObj.rabid;
+			queries_db.insert( { 	'rabid'	: rabid,
 						'source': source,
 						'data'	: queryObj } );
 		})
