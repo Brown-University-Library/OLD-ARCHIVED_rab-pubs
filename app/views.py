@@ -64,11 +64,26 @@ def list_harvest_processes(short_id, source):
 	src_rabid = namespaces.RABID(source).uri
 	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
 	user = Users.query.filter_by(short_id=short_id).first()
-	procs = HarvestProcesses.query.filter_by(
-				user_rabid=user.rabid, source_rabid=src.rabid).all()
-	queries = [ {	'display': proc.process_data,
-			'rabid': namespaces.RABID(proc.rabid).local_name }
-				for proc in procs ]
+	if src.name == 'Web of Science':
+		rabdata_api = os.path.join(hrv_base,'wos/')	
+	elif src.name == 'PubMed':
+		rabdata_api = os.path.join(hrv_base,'pubmed/')
+	elif src.name == 'Academic Analytics':
+		return jsonify({ 'params': [],'queries': [] })
+	else:
+		raise ValueError("Unrecognized source")
+	payload = { 'user' : user.rabid }
+	resp = requests.get( rabdata_api, params=payload )
+	if resp.status_code == 200:
+		data = resp.json()
+		queries = []
+		for d in data:
+			query_rabid = d.keys()[0]
+			query_data = d[ query_rabid ]
+			query_data['rabid'] = namespaces.RABID(query_rabid).local_name
+			queries.append(query_data)
+	else:
+		return 400
 	return jsonify(
 		{ 'params': src.params,'queries': queries })
 

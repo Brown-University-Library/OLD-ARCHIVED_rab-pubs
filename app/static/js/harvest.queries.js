@@ -51,7 +51,7 @@ harvest.queries = (function() {
                             'data-source' : queryObj.source
                           });
         $title = $('<h5/>', { 'class' : 'queries-title',
-                                'text'  : queryObj.display });
+                                'text'  : queryObj.data.label });
         $modal_btn = $('<button/>', { 'type'        : 'button',
                                       'class'       : 'btn btn-primary query-modal-btn',
                                       'data-rabid'   : queryObj.rabid,
@@ -92,7 +92,7 @@ harvest.queries = (function() {
     onClickQueryDetailsModal = function ( rabid ) {
        var
          $modal, $table,
-         queryObj;
+         queryObj, data;
       
        $modal = jqueryMap.$modal;
        $table = $('<table/>');
@@ -100,16 +100,17 @@ harvest.queries = (function() {
        $body.empty()
 
        queryObj = configMap.queries_model.get( {'rabid' : rabid.toString() });
-       queryObj.display.details.forEach( function( detailsObj ) {
+       data = queryObj.data;
+       for (const attr of Object.keys(data)) {
            $tr = $('<tr/>');
            $key = $('<th/>', { 'scope': 'row',
-                               'text' : detailsObj.key });
-           $value = $('<td/>', { 'text' : detailsObj.value });
+                               'text' : attr });
+           $value = $('<td/>', { 'text' : data[ attr ] });
 
            $tr.append($key);
            $tr.append($value);
            $table.append($tr);
-       });
+       };
 
        $body.append($table);
        $modal.modal('show');

@@ -27,7 +27,9 @@ harvest.model = (function () {
 		var queries = data.queries;
 		queries.forEach( function ( queryObj ) {
 			queryObj.source = source;
-			queries_db.insert( queryObj );
+			queries_db.insert( { 	'rabid'	: queryObj.rabid,
+						'source': source,
+						'data'	: queryObj } );
 		})
 		$( window ).trigger( 'queriesQueryCompleted', source );
 	};
