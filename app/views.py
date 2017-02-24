@@ -4,25 +4,25 @@ import requests
 
 from flask import request, render_template, jsonify
 from app import app, db
-from app.models import Users, HarvestExids, HarvestProcesses, HarvestSources
-
-from app.harvest import pubmed
-from app.lookup import dois, pmids, wosids
-from app.utils import wos, namespaces
+from app.models import local, rab
+# from app.harvest import pubmed
+# from app.lookup import dois, pmids, wosids
+# from app.utils import wos, namespaces
 
 rest_base = app.config['REST_BASE']
 app_base = app.config['APP_BASE']
 hrv_base = os.path.join(rest_base, 'harvest')
 
-wos_session = wos.Session()
-wos_session.authenticate()
+# wos_session = wos.Session()
+# wos_session.authenticate()
 
 
 @app.route('/<short_id>/pending')
 def pending(short_id):
-	user = Users.query.filter_by(short_id=short_id).first()
-	sources = HarvestSources.query.all()
-	exids = HarvestExids.query.filter_by(user_rabid=user.rabid, status='p').all()
+	user = local.Users.query.filter_by(short_id=short_id).first()
+	sources = local.HarvestSources.query.all()
+	exids = local.HarvestExids.query.filter_by(
+				user_rabid=user.rabid, status='p').all()
 	exids_by_source = { source.rabid: []  for source in sources }
 	for exid in exids:
 		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
@@ -41,22 +41,15 @@ def pending(short_id):
 
 @app.route('/<short_id>/pending/<source_id>')
 def lookup_pending(short_id, source_id):
-	src_rabid = namespaces.RABID(source_id).uri
-	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
+	src_rabid = namespaces.RABID + source_id
+	src = local.HarvestSources.query.filter_by(rabid=src_rabid).first()
+	rab_src = rab.RABFactory(src.rdf_type, uri=src.rabid)
 	user = Users.query.filter_by(short_id=short_id).first()
 	exids = HarvestExids.query.filter_by(
 				user_rabid=user.rabid,
 				source_rabid=src_rabid,
 				status='p').all()
-	if src.name == 'Web of Science':
-		sid = wos_session.get_sid()
-		lookups = wosids.get_details([ exid.exid for exid in exids ], sid)	
-	elif src.name == 'Academic Analytics':
-		lookups = dois.get_details([ exid.exid for exid in exids])
-	elif src.name == 'PubMed':
-		lookups = pmids.get_details([ exid.exid for exid in exids ])
-	else:
-		raise ValueError("Unrecognized source")
+	lookups = rab_src.lookup_exids([ exid.exid for exid in exids ])
 	return jsonify([ lookup.json() for lookup in lookups ])
 
 @app.route('/<short_id>/harvest/<source>', methods=['GET'])
