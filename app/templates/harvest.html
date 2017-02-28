@@ -25,7 +25,7 @@
   <body data-shortid="{{ user.short_id }}">
       <h1>{{ user.rabid }}</h1>
         {% for source, data in counts.items() %}
-          <div class="api-source" data-rabid="{{ source }}">
+          <div class="api-source" data-rabid="{{ data.id }}">
             <h2>{{ data.name }}</h2>
             <div class="panel-group" id="{{ source }}-accordion" role="tablist" aria-multiselectable="true">
               <div class="panel panel-default">

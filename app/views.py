@@ -25,7 +25,7 @@ def pending(short_id):
 	exids_by_source = { source.uri: []  for source in sources }
 	for exid in exids:
 		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
-	exid_counts_by_source = { source.local_name: {
+	exid_counts_by_source = { source.local_name: {		'id': source.id,
 								'name': source.label,
 								'count': len(exids_by_source[source.uri])
 								} for source in sources }
@@ -43,21 +43,21 @@ def lookup_pending(short_id, source_id):
 	src_rabid = namespaces.RABID + source_id
 	src = local.HarvestSources.query.filter_by(rabid=src_rabid).first()
 	rab_src = rab.HarvestSourceFactory(src.display, uri=src.rabid)
-	user = Users.query.filter_by(short_id=short_id).first()
-	exids = HarvestExids.query.filter_by(
+	user = local.Users.query.filter_by(short_id=short_id).first()
+	exids = local.HarvestExids.query.filter_by(
 				user_rabid=user.rabid,
 				source_rabid=src_rabid,
 				status='p').all()
-	lookups = rab_src.lookup_exids([ exid.exid for exid in exids ])
+	lookups = rab_src.exid_lookup([ exid.exid for exid in exids ])
 	return jsonify([ lookup.json() for lookup in lookups ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['GET'])
 def list_harvest_processes(short_id, source_id):
 	src_rabid = namespaces.RABID + source_id
-	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
+	src = local.HarvestSources.query.filter_by(rabid=src_rabid).first()
 	rab_src = rab.HarvestSourceFactory(src.display, uri=src.rabid)
-	user = Users.query.filter_by(short_id=short_id).first()
-	procs = HarvestProcesses.query.filter_by(source_rabid=src_rabid, user_rabid=user.rabid)
+	user = local.Users.query.filter_by(short_id=short_id).first()
+	procs = local.HarvestProcesses.query.filter_by(source_rabid=src_rabid, user_rabid=user.rabid)
 	return jsonify([ { proc.rabid: proc.display } for proc in procs ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['POST'])

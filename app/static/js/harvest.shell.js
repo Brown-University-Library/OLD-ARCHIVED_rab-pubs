@@ -30,7 +30,8 @@ harvest.shell = (function () {
   };
 
   onQueriesQueryCompleted = function ( source ) {
-    harvest.queries.loadQueries( source );
+    //harvest.queries.loadQueries( source );
+    console.log( source );
   };
 
   //----------------------- END CALLBACKS ----------------------
