@@ -46,10 +46,11 @@ class HarvestEvents(db.Model):
 class HarvestProcesses(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
+	display = db.Column(db.String)
+	rabclass = db.Column(db.String(255))
+	status = db.Column(db.String)
 	user_rabid = db.Column(db.String, db.ForeignKey('users.rabid'))
 	source_rabid = db.Column(db.String, db.ForeignKey('harvest_sources.rabid'))
-	process_data = db.Column(db.String)
-	status = db.Column(db.String)
 	events = db.relationship('HarvestEvents',
 									backref='process', 
 									lazy='dynamic')
@@ -57,7 +58,8 @@ class HarvestProcesses(db.Model):
 class HarvestSources(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	rabid = db.Column(db.String(255))
-	name = db.Column(db.String(255))
+	display = db.Column(db.String)
+	rabclass = db.Column(db.String(255))
 	params = db.Column(db.PickleType)
 	processes = db.relationship('HarvestProcesses',
 									backref='source', 

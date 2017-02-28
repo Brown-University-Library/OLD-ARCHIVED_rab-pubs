@@ -60,10 +60,11 @@ drop table if exists harvest_processes;
 create table harvest_processes (
     id integer primary key autoincrement,
     rabid varchar not null,
+    display varchar not null,
+    rabclass varchar not null,
+    status varchar not null,
     user_rabid varchar not null,
     source_rabid varchar not null,
-    process_data text not null,
-    status varchar not null,
     FOREIGN KEY(source_rabid) REFERENCES harvest_sources(rabid),
     FOREIGN KEY(user_rabid) REFERENCES users(rabid)
 );
@@ -72,8 +73,8 @@ drop table if exists harvest_sources;
 create table harvest_sources (
     id integer primary key autoincrement,
     rabid varchar not null,
-    name varchar not null,
-    params blob
+    display varchar not null,
+    rabclass varchar not null,
 );
 
 create index user_rabids on users(rabid);
