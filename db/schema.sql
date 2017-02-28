@@ -74,7 +74,7 @@ create table harvest_sources (
     id integer primary key autoincrement,
     rabid varchar not null,
     display varchar not null,
-    rabclass varchar not null,
+    rabclass varchar not null
 );
 
 create index user_rabids on users(rabid);

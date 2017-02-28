@@ -1,5 +1,5 @@
 from app import db
-from app.models import HarvestExids, HarvestEvents, HarvestProcesses, HarvestSources
+from app.models import local
 
 from collections import defaultdict
 import csv
@@ -8,15 +8,15 @@ from datetime import datetime
 
 
 def main(exIdFile):
-	srcs = HarvestSources.query.all()
-	src_rabids_map = { src.rabid: src.name for src in srcs }
-	src_names_map = { src.name: src.rabid for src in srcs }
+	srcs = local.HarvestSources.query.all()
+	src_rabids_map = { src.rabid: src.display for src in srcs }
+	src_names_map = { src.display: src.rabid for src in srcs }
 
-	procs = HarvestProcesses.query.all()
+	procs = local.HarvestProcesses.query.all()
 	proc_user_map = {}
 	proc_src_map = {}
 	for proc in procs:
-		event = HarvestEvents()
+		event = local.HarvestEvents()
 		event.proc_rabid = proc.rabid
 		event.event_date = datetime.now()
 		event.user_initiated = False
@@ -27,7 +27,7 @@ def main(exIdFile):
 		proc_src_map[proc.rabid] = src_name
 	db.session.commit()
 
-	events = HarvestEvents.query.all()
+	events = local.HarvestEvents.query.all()
 	user_event_map = defaultdict(dict)
 	for event in events:
 		user_rabid = proc_user_map[event.proc_rabid]
@@ -39,7 +39,7 @@ def main(exIdFile):
 		reader = csv.reader(exids)
 
 		for row in reader:
-			hrv = HarvestExids()
+			hrv = local.HarvestExids()
 			hrv.exid = row[0]
 			hrv.event_id = user_event_map[row[1]][row[2]]
 			hrv.user_rabid = row[1]

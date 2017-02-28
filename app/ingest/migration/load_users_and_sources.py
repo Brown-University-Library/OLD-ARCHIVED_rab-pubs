@@ -1,5 +1,5 @@
 from app import db
-from app.models import Users, HarvestSources, HarvestProcesses
+from app.models import local
 import uuid
 import csv
 import sys
@@ -7,19 +7,19 @@ import sys
 from app.utils import namespaces
 
 def main(userFile):
-	pubmed = HarvestSources()
+	pubmed = local.HarvestSources()
 	pubmed.rabid = namespaces.RABID + uuid.uuid4().hex
 	pubmed.display = "PubMed"
 	pubmed.rabclass = namespaces.BHARVEST + "HarvestSource"
 	db.session.add(pubmed)
 
-	wos = HarvestSources()
+	wos = local.HarvestSources()
 	wos.rabid = namespaces.RABID + uuid.uuid4().hex
 	wos.display = "Web of Science"
 	wos.rabclass = namespaces.BHARVEST + "HarvestSource"
 	db.session.add(wos)
 
-	acad = HarvestSources()
+	acad = local.HarvestSources()
 	acad.rabid = namespaces.RABID + uuid.uuid4().hex
 	acad.display = "Academic Analytics"
 	acad.rabclass = namespaces.BHARVEST + "HarvestSource"
@@ -29,17 +29,17 @@ def main(userFile):
 
 	with open(userFile,'rb') as users:
 		reader = csv.reader(users)
-		pbmd = HarvestSources.query.filter_by(display="PubMed").first()
-		web = HarvestSources.query.filter_by(display="Web of Science").first()
-		acd = HarvestSources.query.filter_by(display="Academic Analytics").first()
+		pbmd = local.HarvestSources.query.filter_by(display="PubMed").first()
+		web = local.HarvestSources.query.filter_by(display="Web of Science").first()
+		acd = local.HarvestSources.query.filter_by(display="Academic Analytics").first()
 
 		for row in reader:
-			user = Users()
+			user = local.Users()
 			user.rabid = row[0]
 			user.short_id = row[1]
 			db.session.add(user)
 			
-			pbmd_proc = HarvestProcesses()
+			pbmd_proc = local.HarvestProcesses()
 			pbmd_proc.rabid = namespaces.RABID + uuid.uuid4().hex
 			pbmd_proc.user_rabid = row[0]
 			pbmd_proc.source_rabid = pbmd.rabid
@@ -49,7 +49,7 @@ def main(userFile):
 			pbmd_proc.rabclass = namespaces.BHARVEST + "PubMedSearch"
 			db.session.add(pbmd_proc)
 
-			web_proc = HarvestProcesses()
+			web_proc = local.HarvestProcesses()
 			web_proc.rabid = namespaces.RABID + uuid.uuid4().hex
 			web_proc.user_rabid = row[0]
 			web_proc.source_rabid = web.rabid
@@ -59,7 +59,7 @@ def main(userFile):
 			web_proc.rabclass = namespaces.BHARVEST + "WebOfScienceSearch"
 			db.session.add(web_proc)
 
-			acd_proc = HarvestProcesses()
+			acd_proc = local.HarvestProcesses()
 			acd_proc.rabid = namespaces.RABID + uuid.uuid4().hex
 			acd_proc.user_rabid = row[0]
 			acd_proc.source_rabid = acd.rabid

@@ -60,7 +60,6 @@ class HarvestSources(db.Model):
 	rabid = db.Column(db.String(255))
 	display = db.Column(db.String)
 	rabclass = db.Column(db.String(255))
-	params = db.Column(db.PickleType)
 	processes = db.relationship('HarvestProcesses',
 									backref='source', 
 									lazy='dynamic')
