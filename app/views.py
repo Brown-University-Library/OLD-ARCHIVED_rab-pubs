@@ -58,7 +58,7 @@ def list_harvest_processes(short_id, source_id):
 	rab_src = rab.HarvestSourceFactory(src.display, uri=src.rabid)
 	user = local.Users.query.filter_by(short_id=short_id).first()
 	procs = local.HarvestProcesses.query.filter_by(source_rabid=src_rabid, user_rabid=user.rabid)
-	return jsonify([ { proc.rabid: proc.display } for proc in procs ])
+	return jsonify([ dict(rabid=proc.rabid,display=proc.display) for proc in procs ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['POST'])
 def create_harvest_process(short_id, source_id):

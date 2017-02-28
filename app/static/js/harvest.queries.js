@@ -51,7 +51,7 @@ harvest.queries = (function() {
                             'data-source' : queryObj.source
                           });
         $title = $('<h5/>', { 'class' : 'queries-title',
-                                'text'  : queryObj.data.label });
+                                'text'  : queryObj.display });
         $modal_btn = $('<button/>', { 'type'        : 'button',
                                       'class'       : 'btn btn-primary query-modal-btn',
                                       'data-rabid'   : queryObj.rabid,
