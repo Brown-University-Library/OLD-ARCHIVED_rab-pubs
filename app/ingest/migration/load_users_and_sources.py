@@ -1,29 +1,53 @@
-from app import db
+from app import db, app
 from app.models import local
 import uuid
 import csv
 import sys
+import os
+import requests
 
 from app.utils import namespaces
 
+hrv_base = os.path.join(app.config['REST_BASE'], 'harvest')
+headers = {	'Content-type': 'application/json',
+		'Accept': 'text/plain',
+		'Connection': 'close' }
+
 def main(userFile):
-	pubmed = local.HarvestSources()
-	pubmed.rabid = namespaces.RABID + uuid.uuid4().hex
-	pubmed.display = "PubMed"
-	pubmed.rabclass = namespaces.BHARVEST + "HarvestSource"
-	db.session.add(pubmed)
+	source_api = os.path.join(hrv_base, 'sources/')
 
-	wos = local.HarvestSources()
-	wos.rabid = namespaces.RABID + uuid.uuid4().hex
-	wos.display = "Web of Science"
-	wos.rabclass = namespaces.BHARVEST + "HarvestSource"
-	db.session.add(wos)
+	pubmed_data = dict()
+	pubmed_data['label'] = ["PubMed"]
+	pubmed_data['class'] = [ namespaces.BHARVEST + "Source" ]
+	resp = requests.post(source_api, headers=headers, json=pubmed_data)
+	if resp.status_code == 200:
+		pubmed = local.HarvestSources()
+		pubmed.rabid = resp.json().keys()[0]
+		pubmed.display = resp.json()[pubmed.rabid]['label'][0]
+		pubmed.rabclass = resp.json()[pubmed.rabid]['class'][0]
+		db.session.add(pubmed)
 
-	acad = local.HarvestSources()
-	acad.rabid = namespaces.RABID + uuid.uuid4().hex
-	acad.display = "Academic Analytics"
-	acad.rabclass = namespaces.BHARVEST + "HarvestSource"
-	db.session.add(acad)
+	wos_data = dict()
+	wos_data['label'] = ["Web of Science"]
+	wos_data['class'] = [ namespaces.BHARVEST + "Source" ]
+	resp = requests.post(source_api, headers=headers, json=wos_data)
+	if resp.status_code == 200:
+		wos = local.HarvestSources()
+		wos.rabid = resp.json().keys()[0]
+		wos.display = resp.json()[wos.rabid]['label'][0]
+		wos.rabclass = resp.json()[wos.rabid]['class'][0]
+		db.session.add(wos)
+
+	acad_data = dict()
+	acad_data['label'] = ["Academic Analytics"]
+	acad_data['class'] = [ namespaces.BHARVEST + "Source" ]
+	resp = requests.post(source_api, headers=headers, json=acad_data)
+	if resp.status_code == 200:
+		acad = local.HarvestSources()
+		acad.rabid = resp.json().keys()[0]
+		acad.display = resp.json()[acad.rabid]['label'][0]
+		acad.rabclass = resp.json()[acad.rabid]['class'][0]
+		db.session.add(acad)
 
 	db.session.commit()
 
@@ -33,41 +57,70 @@ def main(userFile):
 		web = local.HarvestSources.query.filter_by(display="Web of Science").first()
 		acd = local.HarvestSources.query.filter_by(display="Academic Analytics").first()
 
+		process_api = os.path.join(hrv_base, 'processes/')
+
 		for row in reader:
 			user = local.Users()
 			user.rabid = row[0]
 			user.short_id = row[1]
 			db.session.add(user)
 			
-			pbmd_proc = local.HarvestProcesses()
-			pbmd_proc.rabid = namespaces.RABID + uuid.uuid4().hex
-			pbmd_proc.user_rabid = row[0]
-			pbmd_proc.source_rabid = pbmd.rabid
-			pbmd_proc.display = "Django migration"
-			pbmd_proc.status = 'i'
-			#pbmd_proc.rabclass = namespaces.BHARVEST + "DjangoMigration"
-			pbmd_proc.rabclass = namespaces.BHARVEST + "PubMedSearch"
-			db.session.add(pbmd_proc)
+			proc_data = dict()
+			proc_data['label'] = ["PubMed Django Migration"]
+			proc_data['class'] = [ namespaces.BHARVEST + "HarvestProcess", namespaces.BHARVEST + "PubMedSearch" ]
+			proc_data['user'] = [ row[0] ]
+			proc_data['source'] = [ pbmd.rabid ]
+			proc_data['status'] = [ 'i' ]
+			proc_data['query'] = []
+			resp = requests.post(process_api, headers=headers, json=proc_data)
+			if resp.status_code == 200:
+				proc = local.HarvestProcesses()
+				proc.rabid = resp.json().keys()[0]
+				proc.display = resp.json()[proc.rabid]['label'][0]
+				proc.source_rabid = resp.json()[proc.rabid]['source'][0]
+				proc.user_rabid = resp.json()[proc.rabid]['user'][0]
+				proc.status = resp.json()[proc.rabid]['status'][0]
+				#pbmd_proc.rabclass = namespaces.BHARVEST + "DjangoMigration"
+				proc.rabclass = namespaces.BHARVEST + "PubMedSearch"
+				db.session.add(proc)
 
-			web_proc = local.HarvestProcesses()
-			web_proc.rabid = namespaces.RABID + uuid.uuid4().hex
-			web_proc.user_rabid = row[0]
-			web_proc.source_rabid = web.rabid
-			web_proc.display = "Django migration"
-			web_proc.status = 'i'
-			#web_proc.rabclass = namespaces.BHARVEST + "DjangoMigration"
-			web_proc.rabclass = namespaces.BHARVEST + "WebOfScienceSearch"
-			db.session.add(web_proc)
+			proc_data = dict()
+			proc_data['label'] = ["WOS Django Migration"]
+			proc_data['class'] = [ namespaces.BHARVEST + "HarvestProcess", namespaces.BHARVEST + "WebOfScienceSearch" ]
+			proc_data['user'] = [ row[0] ]
+			proc_data['source'] = [ web.rabid ]
+			proc_data['status'] = [ 'i' ]
+			proc_data['query'] = []
+			resp = requests.post(process_api, headers=headers, json=proc_data)
+			if resp.status_code == 200:
+				proc = local.HarvestProcesses()
+				proc.rabid = resp.json().keys()[0]
+				proc.display = resp.json()[proc.rabid]['label'][0]
+				proc.source_rabid = resp.json()[proc.rabid]['source'][0]
+				proc.user_rabid = resp.json()[proc.rabid]['user'][0]
+				proc.status = resp.json()[proc.rabid]['status'][0]
+				#pbmd_proc.rabclass = namespaces.BHARVEST + "DjangoMigration"
+				proc.rabclass = namespaces.BHARVEST + "WebOfScienceSearch"
+				db.session.add(proc)
 
-			acd_proc = local.HarvestProcesses()
-			acd_proc.rabid = namespaces.RABID + uuid.uuid4().hex
-			acd_proc.user_rabid = row[0]
-			acd_proc.source_rabid = acd.rabid
-			acd_proc.display = "Django migration"
-			acd_proc.status = 'i'
-			#acd_proc.rabclass = namespaces.BHARVEST + "DjangoMigration"
-			acd_proc.rabclass = namespaces.BHARVEST + "AcademicAnaylticsUpload"
-			db.session.add(acd_proc)
+			proc_data = dict()
+			proc_data['label'] = ["AA Django Migration"]
+			proc_data['class'] = [ namespaces.BHARVEST + "HarvestProcess", namespaces.BHARVEST + "AcademicAnalyticsUpload" ]
+			proc_data['user'] = [ row[0] ]
+			proc_data['source'] = [ acd.rabid ]
+			proc_data['status'] = [ 'i' ]
+			proc_data['query'] = []
+			resp = requests.post(process_api, headers=headers, json=proc_data)
+			if resp.status_code == 200:
+				proc = local.HarvestProcesses()
+				proc.rabid = resp.json().keys()[0]
+				proc.display = resp.json()[proc.rabid]['label'][0]
+				proc.source_rabid = resp.json()[proc.rabid]['source'][0]
+				proc.user_rabid = resp.json()[proc.rabid]['user'][0]
+				proc.status = resp.json()[proc.rabid]['status'][0]
+				#pbmd_proc.rabclass = namespaces.BHARVEST + "DjangoMigration"
+				proc.rabclass = namespaces.BHARVEST + "AcademicAnalyticsUpload"
+				db.session.add(proc)
 
 		db.session.commit()
 
