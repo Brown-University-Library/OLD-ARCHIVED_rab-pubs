@@ -1,4 +1,5 @@
 import os
+import requests
 
 from app import app, db
 from app.utils import namespaces, prefixes, wos
@@ -34,6 +35,10 @@ class RABObject(object):
 		elif id:
 			self.id = id
 			self.uri = self.uri_ns + id
+			self.local_name = self.prefix + id
+		elif id and uri:
+			self.id = id
+			self.uri = uri
 			self.local_name = self.prefix + id
 
 	def publish(self):
@@ -140,12 +145,27 @@ class WebOfScience(HarvestSource):
 
 
 
+def HarvestProcessFactory(rdfType=None, uri=None, local_name=None, id=None):
+	if rdfType == None:
+		if id:
+			uri = namespaces.RABID + id 
+			proc = local.HarvestProcesses.query.filter_by(rabid=uri).first()
+			rdfType = proc.rabclass
+		elif uri:
+			proc = local.HarvestProcesses.query.filter_by(rabid=uri).first()
+			rdfType = proc.rabclass
+	for cls in HarvestProcess.__subclasses__():
+		if cls.checkRdfType(rdfType):
+			return cls(uri=uri, local_name=local_name, id=id)
+	
+
 class HarvestProcess(RABObject):
 
 	rdf_type = [ namespaces.BHARVEST + "HarvestProcess" ]
 
 	def __init__(self, uri=None, local_name=None, id=None):
 		self.rab_api = os.path.join(harvest_base, 'processes/')
+		self.prefix = prefixes.BHARVEST
 		super(HarvestProcess, self).__init__(uri=uri, local_name=local_name, id=id)
 
 	def create(self, user_rabid=None, src_rabid=None, data=None):
@@ -177,13 +197,15 @@ class HarvestProcess(RABObject):
 		if resp.status_code == 200:
 			rab_obj = resp.json()
 			rabid = rab_obj.keys()[0]
-			data = rab_obj[rabid]
-			del data['class']
-			del data['user']
-			data['rabid'] = self.uri
-			return jsonify(data)
+			assert rabid == self.uri
+			self.data = rab_obj[self.uri]
 		else:
-			return 400
+			self.data = dict()
+
+	def publish(self):
+		display = self.data.get('label', '')
+		return dict(id=self.id, rabid=self.uri, ns=self.local_name,
+				params=self.params, display=display, data=self.data)
 
 class WebOfScienceSearch(HarvestProcess):
 
@@ -221,3 +243,13 @@ class PubMedSearch(HarvestProcess):
 						'Date - Create','Author - Identifier',
 						'Author - Corporate']
 		super(PubMedSearch, self).__init__(uri=uri, local_name=local_name, id=id)
+
+class AcademicAnalyticsUpload(HarvestProcess):
+
+	rdf_type = [	namespaces.BHARVEST + "HarvestProcess",
+			namespaces.BHARVEST + "AcademicAnalyticsUpload" ]
+
+	def __init__(self, uri=None, local_name=None, id=None):
+		self.params = []
+		super(AcademicAnalyticsUpload, self).__init__(uri=uri, local_name=local_name, id=id)
+

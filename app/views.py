@@ -57,8 +57,11 @@ def list_harvest_processes(short_id, source_id):
 	src = local.HarvestSources.query.filter_by(rabid=src_rabid).first()
 	rab_src = rab.HarvestSourceFactory(src.display, uri=src.rabid)
 	user = local.Users.query.filter_by(short_id=short_id).first()
-	procs = local.HarvestProcesses.query.filter_by(source_rabid=src_rabid, user_rabid=user.rabid)
-	return jsonify([ dict(rabid=proc.rabid,display=proc.display) for proc in procs ])
+	proc_objs = local.HarvestProcesses.query.filter_by(source_rabid=src_rabid, user_rabid=user.rabid)
+	procs = [ rab.HarvestProcessFactory(uri=proc_obj.rabid) for proc_obj in proc_objs ]
+	for proc in procs:
+		proc.get()
+	return jsonify([ proc.publish() for proc in procs ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['POST'])
 def create_harvest_process(short_id, source_id):
@@ -68,28 +71,11 @@ def create_harvest_process(short_id, source_id):
 	data = request.get_json()
 	proc = rab.HarvestProcessFactory(  )
 
-@app.route('/<short_id>/harvest/<source>/<proc_id>', methods=['GET'])
-def get_harvest_process(short_id, source, proc_id):
-	proc_id = namespaces.RABID(proc_id).id
-	src_rabid = namespaces.RABID(source).uri
-	src = HarvestSources.query.filter_by(rabid=src_rabid).first()
-	if src.name == 'Web of Science':
-		rabdata_api = os.path.join(hrv_base,'wos/')	
-	elif src.name == 'PubMed':
-		rabdata_api = os.path.join(hrv_base,'pubmed/')
-	else:
-		raise ValueError("Unrecognized source")
-	resp = requests.get( rabdata_api + proc_id )
-	if resp.status_code == 200:
-		rab_obj = resp.json()
-		rabid = rab_obj.keys()[0]
-		data = rab_obj[rabid]
-		del data['class']
-		del data['user']
-		data['rabid'] = namespaces.RABID(rabid).local_name
-		return jsonify(data)
-	else:
-		return 400
+@app.route('/<short_id>/harvest/<proc_id>', methods=['GET'])
+def get_harvest_process(short_id, proc_id):
+	proc = rab.HarvestProcessFactory(id=proc_id)
+	proc.get()
+	return jsonify(proc.publish())
 
 @app.route('/<short_id>/harvest/<proc_id>', methods=['PUT'])
 def update_harvest_process(short_id, proc_id):

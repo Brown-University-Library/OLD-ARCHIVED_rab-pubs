@@ -27,6 +27,7 @@ harvest.model = (function () {
 		//var queries = data.queries;
 		//queries.forEach( function ( queryObj ) {
 		data.forEach( function ( queryObj ) {
+			console.log(queryObj);
 			var rabid = queryObj.rabid;
 			delete queryObj.rabid;
 			queries_db.insert( { 	'rabid'	: rabid,
