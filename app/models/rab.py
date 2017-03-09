@@ -35,6 +35,21 @@ class RABObject(object):
 	def publish(self):
 		return dict(id=self.id, rabid=self.uri, display=self.label, data=self.data)
 
+	def retrieve(self):
+		if self.existing:
+			resp = requests.get(self.rab_api + self.id)
+		else:
+			return
+		if resp.status_code == 200:
+			self.etag = resp.headers.get('ETag')
+			data = resp.json()
+			rab_uri = data.keys()[0]
+			assert rab_uri == self.uri
+			self.load_data(data)
+		else:
+			self.data = dict()
+			self.existing = False
+
 	def load_data(self, data):
 		self.uri = data.keys()[0]
 		self.id = self.uri[len(self.uri_ns):]
@@ -74,7 +89,6 @@ class RABObject(object):
 			return idx
 		else:
 			raise
-
 
 wos_session = wos.Session()
 wos_session.authenticate()
