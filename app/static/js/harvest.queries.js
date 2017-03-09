@@ -142,12 +142,12 @@ harvest.queries = (function() {
       $input_group.append($select).append($text_input).append($rmv_button);
       $form_group.append($input_group);
 
-      for (const attr of Object.keys(params)) {
+      params.forEach( function(param) {
         var $option;
-        $option = $('<option/>', {'value' : attr,
-                                  'text'  : params[attr]});
+        $option = $('<option/>', {'value' : param,
+                                  'text'  : param});
         $select.append($option);
-      };
+      });
 
       return $form_group;
     };
@@ -176,7 +176,7 @@ harvest.queries = (function() {
       $label_group.append($label_name).append($label_input);
       $form.append($label_group);
 
-      queryObj = configMap.params_model.get( {'source' : src.toString() });
+      queryObj = configMap.queries_model.get( {'source' : src.toString() });
       $form_group = makeNewQueryField( queryObj.params );
       $form.append($form_group);
       
@@ -196,7 +196,7 @@ harvest.queries = (function() {
 
     onClickNewQueryField = function ( $form ) {
       var src = $form.data('source');
-      queryObj = configMap.params_model.get( {'source' : src.toString() });
+      queryObj = configMap.queries_model.get( {'source' : src.toString() });
       $form_group = makeNewQueryField( queryObj.params );
       $form.append($form_group);
 
