@@ -40,7 +40,6 @@ def pending(short_id):
 @app.route('/<short_id>/pending/<source_id>')
 def lookup_pending(short_id, source_id):
 	src = rab.HarvestSource(id=source_id)
-	src.retrieve()
 	user = local.Users.query.filter_by(short_id=short_id).first()
 	exids = local.HarvestExids.query.filter_by(
 				user_rabid=user.rabid,
@@ -52,11 +51,8 @@ def lookup_pending(short_id, source_id):
 @app.route('/<short_id>/harvest/<source_id>', methods=['GET'])
 def list_harvest_processes(short_id, source_id):
 	src = rab.HarvestSource(id=source_id)
-	src.retrieve()
 	user = local.Users.query.filter_by(short_id=short_id).first()
-	procs = rab.HarvestProcess.list({'source': src.uri, 'user': user.rabid})
-	for proc in procs:
-		proc.retrieve()
+	procs = rab.HarvestProcess.all({'source': src.uri, 'user': user.rabid})
 	return jsonify([ proc.publish() for proc in procs ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['POST'])

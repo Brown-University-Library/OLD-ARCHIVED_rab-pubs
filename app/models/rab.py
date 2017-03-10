@@ -14,9 +14,9 @@ class RABObject(object):
 
 	rdf_type = None
 
-	def __init__(self, uri=None, id=None):
+	def __init__(self, uri=None, id=None, existing=True):
 		self.uri_ns = namespaces.RABID
-		self.existing = True
+		self.existing = existing
 		self.prefix = None
 		self.label = None
 		self.etag = None
@@ -29,17 +29,14 @@ class RABObject(object):
 		elif id and not uri:
 			self.id = id
 			self.uri = self.uri_ns + id
-		else:
-			self.existing = False
+		if self.existing:
+			self.retrieve()
 
 	def publish(self):
 		return dict(id=self.id, rabid=self.uri, display=self.label, data=self.data)
 
 	def retrieve(self):
-		if self.existing:
-			resp = requests.get(self.rab_api + self.id)
-		else:
-			return
+		resp = requests.get(self.rab_api + self.id)
 		if resp.status_code == 200:
 			self.etag = resp.headers.get('ETag')
 			data = resp.json()
@@ -74,7 +71,7 @@ class RABObject(object):
 		# 			return rab_obj
 		# else:
 		if cls.rdf_type == rdfType:
-			rab_obj = cls()
+			rab_obj = cls(existing=False)
 			rab_obj.load_data(data)
 			return rab_obj
 
@@ -90,6 +87,19 @@ class RABObject(object):
 		else:
 			raise
 
+	@classmethod
+	def all(cls, params=None):
+		resp = requests.get(cls.rab_api, params=params)
+		if resp.status_code == 200:
+			idx = [] 
+			for data in resp.json():
+				uri = data.keys()[0]
+				new_rab = cls(uri=uri)
+				idx.append(new_rab)
+			return idx
+		else:
+			raise
+
 wos_session = wos.Session()
 wos_session.authenticate()
 
@@ -98,10 +108,10 @@ class HarvestSource(RABObject):
 	rdf_type = [ namespaces.BHARVEST + "Source" ]
 	rab_api = os.path.join(harvest_base, 'sources/')
 
-	def __init__(self, uri=None, id=None):
+	def __init__(self, uri=None, id=None, existing=True):
 		self.prefix = prefixes.BHARVEST
 		self.process_api = os.path.join(harvest_base, 'processes/')
-		super(HarvestSource, self).__init__(uri=uri, id=id)
+		super(HarvestSource, self).__init__(uri=uri, id=id, existing=existing)
 
 	def exid_lookup(self, exidList):
 		if self.label == 'Academic Analytics':
@@ -148,10 +158,10 @@ class HarvestProcess(RABObject):
 	rdf_type = [ namespaces.BHARVEST + "HarvestProcess" ]
 	rab_api = os.path.join(harvest_base, 'processes/')
 
-	def __init__(self, uri=None, id=None):
+	def __init__(self, uri=None, id=None, existing=True):
 		self.prefix = prefixes.BHARVEST
 		self.params = None
-		super(HarvestProcess, self).__init__(uri=uri, id=id)
+		super(HarvestProcess, self).__init__(uri=uri, id=id, existing=existing)
 
 	def create(self, user_rabid=None, src_rabid=None, data=None):
 		for k, v in data.items():
@@ -196,20 +206,20 @@ class WebOfScienceSearch(HarvestProcess):
 	rdf_type = [	namespaces.BHARVEST + "HarvestProcess",
 					namespaces.BHARVEST + "WebOfScienceSearch" ]
 
-	def __init__(self, uri=None, id=None):
+	def __init__(self, uri=None, id=None, existing=True):
 		self.params = 	[	'Topic','Title','Author','Author Identifiers',
 							'Group Author','Editor','Publication Name',
 							'DOI','Year Published','Address',
 							'Organizations-Enhanced','Conference',
 							'Language','Document Type','Funding Agency',
 							'Grant Number','Accession Number','PubMed ID']
-		super(WebOfScienceSearch, self).__init__(uri=uri, id=id)
+		super(WebOfScienceSearch, self).__init__(uri=uri, id=id, existing=existing)
 
 class PubMedSearch(HarvestProcess):
 
 	rdf_type = [	namespaces.BHARVEST + "HarvestProcess",
 					namespaces.BHARVEST + "PubMedSearch" ]
-	def __init__(self, uri=None, id=None):
+	def __init__(self, uri=None, id=None, existing=True):
 		self.params = [	'Title/Abstract','Author - Last','ISBN',
 						'MeSH Terms','Affiliation','Author - Full',
 						'Date - MeSH','Location ID','Publication Type',
@@ -226,14 +236,14 @@ class PubMedSearch(HarvestProcess):
 						'Pharmacological Action','Filter',
 						'Date - Create','Author - Identifier',
 						'Author - Corporate']
-		super(PubMedSearch, self).__init__(uri=uri, id=id)
+		super(PubMedSearch, self).__init__(uri=uri, id=id, existing=existing)
 
 class AcademicAnalyticsUpload(HarvestProcess):
 
 	rdf_type = [	namespaces.BHARVEST + "HarvestProcess",
 			namespaces.BHARVEST + "AcademicAnalyticsUpload" ]
 
-	def __init__(self, uri=None, id=None):
+	def __init__(self, uri=None, id=None, existing=True):
 		self.params = []
-		super(AcademicAnalyticsUpload, self).__init__(uri=uri, id=id)
+		super(AcademicAnalyticsUpload, self).__init__(uri=uri, id=id, existing=existing)
 
