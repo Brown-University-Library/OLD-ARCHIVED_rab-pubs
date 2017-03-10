@@ -18,49 +18,45 @@ app_base = app.config['APP_BASE']
 @app.route('/<short_id>/pending')
 def pending(short_id):
 	user = local.Users.query.filter_by(short_id=short_id).first()
-	sources = [ rab.HarvestSourceFactory(src.display, uri=src.rabid) 
-					for src in local.HarvestSources.query.all() ]
+	sources = rab.HarvestSource.list()
 	exids = local.HarvestExids.query.filter_by(
-				user_rabid=user.rabid, status='p').all()
-	exids_by_source = { source.uri: []  for source in sources }
+						user_rabid=user.rabid, status='p').all()
+	exids_by_source = { source.uri: [] for source in sources }
 	for exid in exids:
 		exids_by_source[ exid.event.process.source_rabid ].append(exid.exid)
-	exid_counts_by_source = { source.local_name: {		'id': source.id,
-								'name': source.label,
-								'count': len(exids_by_source[source.uri])
-								} for source in sources }
+	exid_counts_by_source = { source.id: {	'id': source.id,
+						'name': source.label,
+						'count': len(exids_by_source[source.uri])
+						} for source in sources }
 	config_map = {
-		'app_base' : app_base,
-		'short_id'	: short_id
+		'app_base': app_base,
+		'short_id': short_id
 		}
 	return render_template('harvest.html',
-							user=user,
-							counts=exid_counts_by_source,
-							config=config_map)
+				user=user,
+				counts=exid_counts_by_source,
+				config=config_map)
 
 @app.route('/<short_id>/pending/<source_id>')
 def lookup_pending(short_id, source_id):
-	src_rabid = namespaces.RABID + source_id
-	src = local.HarvestSources.query.filter_by(rabid=src_rabid).first()
-	rab_src = rab.HarvestSourceFactory(src.display, uri=src.rabid)
+	src = rab.HarvestSource(id=source_id)
+	src.retrieve()
 	user = local.Users.query.filter_by(short_id=short_id).first()
 	exids = local.HarvestExids.query.filter_by(
 				user_rabid=user.rabid,
-				source_rabid=src_rabid,
+				source_rabid=src.uri,
 				status='p').all()
-	lookups = rab_src.exid_lookup([ exid.exid for exid in exids ])
+	lookups = src.exid_lookup([ exid.exid for exid in exids ])
 	return jsonify([ lookup.json() for lookup in lookups ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['GET'])
 def list_harvest_processes(short_id, source_id):
-	src_rabid = namespaces.RABID + source_id
-	src = local.HarvestSources.query.filter_by(rabid=src_rabid).first()
-	rab_src = rab.HarvestSourceFactory(src.display, uri=src.rabid)
+	src = rab.HarvestSource(id=source_id)
+	src.retrieve()
 	user = local.Users.query.filter_by(short_id=short_id).first()
-	proc_objs = local.HarvestProcesses.query.filter_by(source_rabid=src_rabid, user_rabid=user.rabid)
-	procs = [ rab.HarvestProcessFactory(uri=proc_obj.rabid) for proc_obj in proc_objs ]
+	procs = rab.HarvestProcess.list({'source': src.uri, 'user': user.rabid})
 	for proc in procs:
-		proc.get()
+		proc.retrieve()
 	return jsonify([ proc.publish() for proc in procs ])
 
 @app.route('/<short_id>/harvest/<source_id>', methods=['POST'])

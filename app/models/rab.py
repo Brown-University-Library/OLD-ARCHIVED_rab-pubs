@@ -150,6 +150,7 @@ class HarvestProcess(RABObject):
 
 	def __init__(self, uri=None, id=None):
 		self.prefix = prefixes.BHARVEST
+		self.params = None
 		super(HarvestProcess, self).__init__(uri=uri, id=id)
 
 	def create(self, user_rabid=None, src_rabid=None, data=None):
@@ -188,8 +189,7 @@ class HarvestProcess(RABObject):
 
 	def publish(self):
 		display = self.data.get('label', '')
-		return dict(id=self.id, rabid=self.uri, ns=self.local_name,
-				params=self.params, display=display, data=self.data)
+		return dict(id=self.id, rabid=self.uri, params=self.params, display=display, data=self.data)
 
 class WebOfScienceSearch(HarvestProcess):
 
