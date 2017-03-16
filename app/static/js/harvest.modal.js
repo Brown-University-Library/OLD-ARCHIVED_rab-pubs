@@ -2,7 +2,7 @@ harvest.modal = (function () {
 
 	var configMap = {
 		main_html : String()
-			+ '<div class="modal fade" tabindex="-1" role="dialog">'
+			+ '<div class="dynamic-modal modal fade" tabindex="-1" role="dialog">'
 				+ '<div class="modal-dialog" role="document">'
 					+ '<div class="modal-content">'
 						+ '<div class="modal-header">'
@@ -35,7 +35,7 @@ harvest.modal = (function () {
 	setJqueryMap = function () {
 		var
 			$append_target = stateMap.$append_target,
-			$modal = $append_target.find('.modal');
+			$modal = $append_target.find('.dynamic-modal');
 
 
 		jqueryMap = {
@@ -59,24 +59,31 @@ harvest.modal = (function () {
 
 		$modal_title.empty();
 		$modal_body.empty();
-		$modal_footer.not('.modal-close').remove();
+		$modal_footer.children().not('.modal-close').remove();
 
 	};
 
 	launchPendingDetail = function ( pendingObj ) {
 		var
-			$modal, $table;
+			$modal, $modal_title, $modal_body,
+			$table, $tbody;
 
 		resetModal();
 
-		$table = $('<table/>');
+		$modal = jqueryMap.$modal;
+		$modal_title = jqueryMap.$modal_title;
+		$modal_body = jqueryMap.$modal_body;
+
+		$modal_title.text('Citation Details');
+
+		$table = $('<table/>', {'class': 'table'});
 		$tbody = $('<tbody/>');
 
 		pendingObj.display.details.forEach( function( detailsObj ) {
-			$tr = $('<tr/>');
-			$key = $('<th/>', { 'scope': 'row',
+			var $tr = $('<tr/>');
+			var $key = $('<th/>', { 'scope': 'row',
 								'text' : detailsObj.key });
-			$value = $('<td/>', { 'text' : detailsObj.value });
+			var $value = $('<td/>', { 'text' : detailsObj.value });
 
 			$tr.append($key);
 			$tr.append($value);
@@ -84,6 +91,7 @@ harvest.modal = (function () {
 		});
 
 		$table.append($tbody);
+		$modal_body.append($table);
 		$modal.modal('show');
 	};
 
