@@ -20,9 +20,7 @@ harvest.pending = (function() {
       var 
         $sources = $('.api-source');
         jqueryMap = {
-          'sources' : {},
-          $modal : $('#modalDetails'),
-          $table : $('#detailsTableBody'),
+          'sources' : {}
         };
 
       $.each($sources, function( i, source ) {
@@ -107,26 +105,11 @@ harvest.pending = (function() {
     };
 
     onClickPendingDetailsModal = function ( exid ) {
-      var
-        $modal, $table,
-        pendingObj;
-      
-      $modal = jqueryMap.$modal;
-      $table = jqueryMap.$table;
-      $table.empty();
+      var pendingObj;
 
       pendingObj = configMap.pending_model.get( {'exid' : exid.toString() });
-      pendingObj.display.details.forEach( function( detailsObj ) {
-          $tr = $('<tr/>');
-          $key = $('<th/>', { 'scope': 'row',
-                              'text' : detailsObj.key });
-          $value = $('<td/>', { 'text' : detailsObj.value });
 
-          $tr.append($key);
-          $tr.append($value);
-          $table.append($tr);
-      });
-      $modal.modal('show');
+      $( window ).trigger( 'launchPendingModal', pendingObj);
     };
 
     configModule = function ( map ) {

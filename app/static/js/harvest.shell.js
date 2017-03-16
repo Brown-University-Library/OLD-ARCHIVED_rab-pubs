@@ -33,6 +33,10 @@ harvest.shell = (function () {
     harvest.queries.loadQueries( source );
   };
 
+  onLaunchPendingModal = function (pendingObj ) {
+    harvest.modal.launchPendingDetail( pendingObj );
+  };
+
   //----------------------- END CALLBACKS ----------------------
   //------------------- BEGIN PUBLIC METHODS -------------------
   // Begin Public method /initModule/
@@ -54,12 +58,18 @@ harvest.shell = (function () {
     });
     harvest.queries.initModule( jqueryMap.$container );
 
+    harvest.modal.initModule( jqueryMap.$container );
+
     $( window ).on( 'pendingQueryCompleted', function( e, source ) {
       onPendingQueryCompleted( source );
     });
 
     $( window ).on( 'queriesQueryCompleted', function( e, source) {
        onQueriesQueryCompleted( source );
+    });
+
+    $( window ).on( 'launchPendingModal', function( e, pendingObj ) {
+      onLaunchPendingModal( pendingObj );
     });
 
   };
