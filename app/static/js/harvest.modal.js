@@ -27,7 +27,6 @@ harvest.modal = (function () {
 
 	jqueryMap = {},
 
-	setHeader, setBody, setFooter,
 	launchPendingDetail, launchProcessDetail,
 	resetModal,
 	setJqueryMap, initModule;
@@ -95,6 +94,74 @@ harvest.modal = (function () {
 		$modal.modal('show');
 	};
 
+	launchProcessDetail = function ( processObj, paramOptList ) {
+		var
+			$modal, $modal_title, $modal_body,
+			operator_list,
+			$form;
+
+		resetModal();
+
+		operator_list = [ 'AND', 'OR', 'NOT' ];
+
+		$modal = jqueryMap.$modal;
+		$modal_title = jqueryMap.$modal_title;
+		$modal_body = jqueryMap.$modal_body;
+
+		$modal_title.text( processObj.display );
+
+		$form = $('<form/>');
+
+		processObj.data.parameters.forEach( function ( param, idx ) {
+			var $div, $select_opr, $select_attr, $input, $rmv;
+
+			$div = $('<div/>',	{	'class': "form-group query-row",
+									'data-index': idx });
+			$select_attr = $('<select/>', {	'class': 'query-att form-control'});
+			$input = $('<input/>',	{	'class': 'query-val form-control',
+										'type': 'text',
+										'value': param.value } );
+
+			paramOptList.forEach( function( opt ) {
+				var $option;
+	        	$option = $('<option/>', {	'value': opt,
+	                                  		'text' : opt });
+	        	if ( param.attribute === opt ) {
+	        		$option.prop('selected', 'selected');
+	        	}
+
+	        	$select_attr.append($option);
+			}); 
+
+			if ( idx === 0) {
+				$select_opr = $('<span/>', { 'class': 'query-opr' });
+				$rmv = $('<span/>', {'class': 'query-rmv' });
+			} else {
+				$select_opr = $('<select/>', { 'class': 'query-opr form-control'});
+
+				operator_list.forEach( function( opt ) {
+					var $option;
+		        	$option = $('<option/>', {	'value': opt,
+		                                  		'text' : opt });
+		        	if ( param.operator === opt ) {
+		        		$option.prop('selected', 'selected');
+		        	}
+
+		        	$select_opr.append($option);
+				});
+
+				$rmv = $('<button/>', {'class': 'btn btn-warning query-rmv',
+								'type': 'button',
+								'html': '\&times\;'});
+			}
+
+			$form.append($div);
+		});
+
+		$modal_body.append($form);
+		$modal.modal('show');
+	};
+
 	initModule = function ( $appendTarget ) {
 
 		stateMap.$append_target = $appendTarget;
@@ -106,9 +173,6 @@ harvest.modal = (function () {
 
 	return {
 		initModule : initModule,
-		setHeader : setHeader,
-		setBody : setBody,
-		setFooter : setFooter,
 		launchPendingDetail : launchPendingDetail,
 		launchProcessDetail : launchProcessDetail
 	};

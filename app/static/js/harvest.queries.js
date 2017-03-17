@@ -3,7 +3,7 @@ harvest.queries = (function() {
     var
       configMap = {
         queries_model : null,
-        params_model : null
+        sources_model : null
       },
 
       stateMap = {},
@@ -90,34 +90,12 @@ harvest.queries = (function() {
     };
 
     onClickQueryDetailsModal = function ( rabid ) {
-       var
-         $modal, $table,
-         queryObj, data;
-      
-       $modal = jqueryMap.$modal;
-       $table = $('<table/>');
-       $body = $modal.find('.modal-body');
-       $body.empty()
+       var queryObj;
 
        queryObj = configMap.queries_model.get( {'rabid' : rabid.toString() });
-       data = queryObj.data;
-       for (const attr of Object.keys(data)) {
-           if (data[ attr ].length === 0 ) {
-             continue;
-           } else {
-             $tr = $('<tr/>');
-             $key = $('<th/>', { 'scope': 'row',
-                                 'text' : attr });
-             $value = $('<td/>', { 'text' : data[ attr ] });
-
-             $tr.append($key);
-             $tr.append($value);
-             $table.append($tr);
-	  }
-       };
-
-       $body.append($table);
-       $modal.modal('show');
+       sourceObj = configMap.sources_model.get( {'rabid' : queryObj.source });
+       
+       $( window ).trigger( 'launchProcessModal', [ queryObj, sourceObj ] );
     };
 
     makeNewQueryField = function ( params ) {
@@ -186,7 +164,7 @@ harvest.queries = (function() {
 					'class'	: 'btn btn-primary',
 					'text'	: '\&plus\;' });
       $add_field_btn.on('click', function(e) {
-	e.preventDefault();
+        e.preventDefault();
         onClickNewQueryField($form);
       });
 
@@ -231,7 +209,7 @@ harvest.queries = (function() {
 
     configModule = function ( map ) {
       configMap.queries_model = map.queries_model;
-      configMap.params_model = map.params_model;
+      configMap.sources_model = map.sources_model;
     };
 
     initModule = function () {

@@ -163,43 +163,43 @@ class HarvestProcess(RABObject):
 		self.params = None
 		super(HarvestProcess, self).__init__(uri=uri, id=id, existing=existing)
 
-	def create(self, user_rabid=None, src_rabid=None, data=None):
-		for k, v in data.items():
-			if isinstance(v, unicode):
-				data[k] = [ v ]
-		for k in src.params.keys():
-			if k not in data:
-				data[k] = []
-		data['user'] = [ user_rabid ]
-		data['class']= self.rdf_type
-		resp = requests.post(rabdata_api, json=data)
-		if resp.status_code == 200:
-			new_proc_rabid = resp.json().keys()[0]
-			new_proc = local.HarvestProcesses()
-			new_proc.rabid = new_proc_rabid
-			new_proc.user_rabid = user_rabid
-			new_proc.source_rabid = src_rabid
-			new_proc.status = "a"
-			new_proc.process_data = resp.json()[new_proc_rabid]['label'][0]
-			db.session.add(new_proc)
-			db.session.commit()
-			return jsonify(resp.json())
-		else:
-			return jsonify({"BAD!!!": resp.text})
+	# def create(self, user_rabid=None, src_rabid=None, data=None):
+	# 	for k, v in data.items():
+	# 		if isinstance(v, unicode):
+	# 			data[k] = [ v ]
+	# 	for k in src.params.keys():
+	# 		if k not in data:
+	# 			data[k] = []
+	# 	data['user'] = [ user_rabid ]
+	# 	data['class']= self.rdf_type
+	# 	resp = requests.post(rabdata_api, json=data)
+	# 	if resp.status_code == 200:
+	# 		new_proc_rabid = resp.json().keys()[0]
+	# 		new_proc = local.HarvestProcesses()
+	# 		new_proc.rabid = new_proc_rabid
+	# 		new_proc.user_rabid = user_rabid
+	# 		new_proc.source_rabid = src_rabid
+	# 		new_proc.status = "a"
+	# 		new_proc.process_data = resp.json()[new_proc_rabid]['label'][0]
+	# 		db.session.add(new_proc)
+	# 		db.session.commit()
+	# 		return jsonify(resp.json())
+	# 	else:
+	# 		return jsonify({"BAD!!!": resp.text})
 
-	def get(self):
-		resp = requests.get( self.rab_api + self.id )
-		if resp.status_code == 200:
-			rab_obj = resp.json()
-			rabid = rab_obj.keys()[0]
-			assert rabid == self.uri
-			self.data = rab_obj[self.uri]
-		else:
-			self.data = dict()
+	# def get(self):
+	# 	resp = requests.get( self.rab_api + self.id )
+	# 	if resp.status_code == 200:
+	# 		rab_obj = resp.json()
+	# 		rabid = rab_obj.keys()[0]
+	# 		assert rabid == self.uri
+	# 		self.data = rab_obj[self.uri]
+	# 	else:
+	# 		self.data = dict()
 
-	def publish(self):
-		display = self.data.get('label', '')
-		return dict(id=self.id, rabid=self.uri, params=self.params, display=display, data=self.data)
+	# def publish(self):
+	# 	display = self.data.get('label', '')
+	# 	return dict(id=self.id, rabid=self.uri, params=self.params, display=display, data=self.data)
 
 class WebOfScienceSearch(HarvestProcess):
 
@@ -207,12 +207,12 @@ class WebOfScienceSearch(HarvestProcess):
 					namespaces.BHARVEST + "WebOfScienceSearch" ]
 
 	def __init__(self, uri=None, id=None, existing=True):
-		self.params = 	[	'Topic','Title','Author','Author Identifiers',
-							'Group Author','Editor','Publication Name',
-							'DOI','Year Published','Address',
-							'Organizations-Enhanced','Conference',
-							'Language','Document Type','Funding Agency',
-							'Grant Number','Accession Number','PubMed ID']
+		# self.params = 	[	'Topic','Title','Author','Author Identifiers',
+		# 					'Group Author','Editor','Publication Name',
+		# 					'DOI','Year Published','Address',
+		# 					'Organizations-Enhanced','Conference',
+		# 					'Language','Document Type','Funding Agency',
+		# 					'Grant Number','Accession Number','PubMed ID']
 		super(WebOfScienceSearch, self).__init__(uri=uri, id=id, existing=existing)
 
 class PubMedSearch(HarvestProcess):
@@ -220,22 +220,22 @@ class PubMedSearch(HarvestProcess):
 	rdf_type = [	namespaces.BHARVEST + "HarvestProcess",
 					namespaces.BHARVEST + "PubMedSearch" ]
 	def __init__(self, uri=None, id=None, existing=True):
-		self.params = [	'Title/Abstract','Author - Last','ISBN',
-						'MeSH Terms','Affiliation','Author - Full',
-						'Date - MeSH','Location ID','Publication Type',
-						'Subject - Personal Name','All Fields',
-						'Author - First','Date - Entrez','Title',
-						'Journal','Transliterated Title',
-						'Investigator - Full','Supplementary Concept',
-						'Book','Editor','Issue','EC/RN Number',
-						'Text Word','Other Term','Grant Number',
-						'Date - Completion','Volume','MeSH Major Topic',
-						'Date - Modification','Date - Publication',
-						'Publisher','Pagination','MeSH Subheading',
-						'Language','Investigator','Secondary Source ID',
-						'Pharmacological Action','Filter',
-						'Date - Create','Author - Identifier',
-						'Author - Corporate']
+		# self.params = [	'Title/Abstract','Author - Last','ISBN',
+		# 				'MeSH Terms','Affiliation','Author - Full',
+		# 				'Date - MeSH','Location ID','Publication Type',
+		# 				'Subject - Personal Name','All Fields',
+		# 				'Author - First','Date - Entrez','Title',
+		# 				'Journal','Transliterated Title',
+		# 				'Investigator - Full','Supplementary Concept',
+		# 				'Book','Editor','Issue','EC/RN Number',
+		# 				'Text Word','Other Term','Grant Number',
+		# 				'Date - Completion','Volume','MeSH Major Topic',
+		# 				'Date - Modification','Date - Publication',
+		# 				'Publisher','Pagination','MeSH Subheading',
+		# 				'Language','Investigator','Secondary Source ID',
+		# 				'Pharmacological Action','Filter',
+		# 				'Date - Create','Author - Identifier',
+		# 				'Author - Corporate']
 		super(PubMedSearch, self).__init__(uri=uri, id=id, existing=existing)
 
 class AcademicAnalyticsUpload(HarvestProcess):

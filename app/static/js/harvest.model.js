@@ -5,13 +5,15 @@ harvest.model = (function () {
 
 		stateMap  = {},
 
-		update,
-		pending,		
-		initModule;
+		pending, update_pending,
+		queries, update_queries,
+		sources, update_sources,
 
-	pending_db = TAFFY();
-	queries_db = TAFFY();
-        params_db = TAFFY();
+		pending_db = TAFFY(),
+		queries_db = TAFFY(),
+    	sources_db = TAFFY(),
+
+    	initModule;
 
 	update_pending = function ( data, source ) {
 		data.forEach( function ( pendingObj ) {
@@ -22,19 +24,23 @@ harvest.model = (function () {
 	};
 
 	update_queries = function ( data, source ) {
-		//var params = data.params;
-		//params_db.insert( {'source': source, 'params': params });
-		//var queries = data.queries;
-		//queries.forEach( function ( queryObj ) {
 		data.forEach( function ( queryObj ) {
 			queries_db.insert( { 	'rabid'	: queryObj.rabid,
 						'source': source,
 						'data'	: queryObj.data,
-						'params' : queryObj.params,
 						'display': queryObj.display } );
-		})
+		});
 		$( window ).trigger( 'queriesQueryCompleted', source );
 	};
+
+	update_sources = function ( sources ) {
+		sources.forEach( function ( sourceObj ) ) {
+			sources_db.insert( {'rabid'		: sourceObj.rabid,
+								'params'	: sourceObj.data.parameters,
+								'data'		: sourceObj.data,
+								'display'	: sourceObj.display });
+		});
+	}
 
 	pending = (function () {
 		var
@@ -105,7 +111,7 @@ harvest.model = (function () {
 		};
 	}());
 
-        params = (function () {
+	sources = (function () {
 		var
 			get, all,
 			create,
@@ -114,14 +120,14 @@ harvest.model = (function () {
 		get = function ( paramObj ) {
 			var data;
 
-			data = params_db( paramObj ).first();
+			data = sources_db( paramObj ).first();
 			return data;
 		};
 
 		all = function ( paramObj ) {
 			var data;
 
-			data = params_db( paramObj ).get();
+			data = sources_db( paramObj ).get();
 			return data;
 		};
 
@@ -131,13 +137,15 @@ harvest.model = (function () {
 		};
 	}());
 
-	initModule = function () {};
+	initModule = function ( sources ) {
+		update_sources (sources );
+	};
 
 	return {
 		initModule : initModule,
 		pending : pending,
 		queries : queries,
-		params : params,
+		sources : sources,
 		update_queries : update_queries,
 		update_pending : update_pending
 	};

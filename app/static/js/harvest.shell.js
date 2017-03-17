@@ -9,6 +9,8 @@ harvest.shell = (function () {
     jqueryMap = {},
     onPendingQueryCompleted,
     onQueriesQueryCompleted,
+    onLaunchPendingModal,
+    onLaunchProcessModal,
 		setJqueryMap, initModule;
 	//----------------- END MODULE SCOPE VARIABLES ---------------
   //------------------- BEGIN UTILITY METHODS ------------------
@@ -33,8 +35,12 @@ harvest.shell = (function () {
     harvest.queries.loadQueries( source );
   };
 
-  onLaunchPendingModal = function (pendingObj ) {
+  onLaunchPendingModal = function ( pendingObj ) {
     harvest.modal.launchPendingDetail( pendingObj );
+  };
+
+  onLaunchProcessModal = function ( processObj, sourceObj ) {
+    harvest.modal.launchProcessDetail( processObj, sourceObj.params );
   };
 
   //----------------------- END CALLBACKS ----------------------
@@ -54,7 +60,7 @@ harvest.shell = (function () {
 
     harvest.queries.configModule({
       queries_model : harvest.model.queries,
-      params_model : harvest.model.params
+      sources_model : harvest.model.sources
     });
     harvest.queries.initModule( jqueryMap.$container );
 
@@ -70,6 +76,10 @@ harvest.shell = (function () {
 
     $( window ).on( 'launchPendingModal', function( e, pendingObj ) {
       onLaunchPendingModal( pendingObj );
+    });
+
+    $( window ).on( 'launchProcessModal', function( e, paramList ) {
+      onLaunchProcessModal( paramList[0], paramList[1] );
     });
 
   };

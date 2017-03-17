@@ -11,9 +11,6 @@ from app.utils import wos, namespaces
 
 app_base = app.config['APP_BASE']
 
-# wos_session = wos.Session()
-# wos_session.authenticate()
-
 
 @app.route('/<short_id>/pending')
 def pending(short_id):
@@ -30,7 +27,8 @@ def pending(short_id):
 						} for source in sources }
 	config_map = {
 		'app_base': app_base,
-		'short_id': short_id
+		'short_id': short_id,
+		'sources' : [ source.publish() for source in sources ]
 		}
 	return render_template('harvest.html',
 				user=user,
