@@ -75,11 +75,12 @@ harvest.queries = (function() {
     };
 
     loadQueries = function (source) {
-      var sourceData,
+      var sourceProcs, sourceObj,
         $lis, $list, $target;
 
-        sourceData = configMap.queries_model.all( {'source' : source} );
-        $lis = makeQueriesList( sourceData );
+        sourceObj = configMap.sources_model.get( {'id' : source} );
+        sourceProcs = configMap.queries_model.all( {'source' : sourceObj.rabid} );
+        $lis = makeQueriesList( sourceProcs );
         $list = $('<ol/>', {'class' : 'list-group'});
         $lis.forEach( function($li) {
           $list.append($li);
@@ -90,7 +91,7 @@ harvest.queries = (function() {
     };
 
     onClickQueryDetailsModal = function ( rabid ) {
-       var queryObj;
+       var queryObj, sourceObj;
 
        queryObj = configMap.queries_model.get( {'rabid' : rabid.toString() });
        sourceObj = configMap.sources_model.get( {'rabid' : queryObj.source });

@@ -78,8 +78,8 @@ harvest.shell = (function () {
       onLaunchPendingModal( pendingObj );
     });
 
-    $( window ).on( 'launchProcessModal', function( e, paramList ) {
-      onLaunchProcessModal( paramList[0], paramList[1] );
+    $( window ).on( 'launchProcessModal', function( e, processObj, sourceObj ) {
+      onLaunchProcessModal( processObj, sourceObj );
     });
 
   };

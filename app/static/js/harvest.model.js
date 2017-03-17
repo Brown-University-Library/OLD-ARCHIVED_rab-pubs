@@ -26,7 +26,8 @@ harvest.model = (function () {
 	update_queries = function ( data, source ) {
 		data.forEach( function ( queryObj ) {
 			queries_db.insert( { 	'rabid'	: queryObj.rabid,
-						'source': source,
+						'id'	: queryObj.id,
+						'source': queryObj.data.source[0],
 						'data'	: queryObj.data,
 						'display': queryObj.display } );
 		});
@@ -34,13 +35,14 @@ harvest.model = (function () {
 	};
 
 	update_sources = function ( sources ) {
-		sources.forEach( function ( sourceObj ) ) {
-			sources_db.insert( {'rabid'		: sourceObj.rabid,
-								'params'	: sourceObj.data.parameters,
-								'data'		: sourceObj.data,
-								'display'	: sourceObj.display });
+		sources.forEach( function ( sourceObj ) {
+			sources_db.insert( {	'rabid'	: sourceObj.rabid,
+						'id'	: sourceObj.id,
+						'params': sourceObj.data.parameters,
+						'data'	: sourceObj.data,
+						'display': sourceObj.display });
 		});
-	}
+	};
 
 	pending = (function () {
 		var
